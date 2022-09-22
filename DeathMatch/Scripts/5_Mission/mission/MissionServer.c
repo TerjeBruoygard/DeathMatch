@@ -3,6 +3,9 @@ modded class MissionServer
 	ref DmConnectSyncContext m_DM_ConnectSyncCtx;
 	ref DM_ServerSettings m_DM_ServerSettings;
 	ref map<string, ref DmPlayerData> m_DmDatabase;
+	ref DM_AreaTrail m_DmCurrentTrail;
+	float m_DmTrailShift = 0;
+	float m_DmTrailTimer = 0;
 	float m_DM_currentRadius;
 	
     override void OnInit()
@@ -23,8 +26,14 @@ modded class MissionServer
 			JsonFileLoader<ref DM_ServerSettings>.JsonLoadFile(path, m_DM_ServerSettings);
 		}
 		
+		if (!m_DM_ServerSettings.m_trails || m_DM_ServerSettings.m_trails.Count() == 0)
+		{
+			m_DM_ServerSettings.InitDefaultTrails();
+		}
+		
 		JsonFileLoader<ref DM_ServerSettings>.JsonSaveFile(path, m_DM_ServerSettings);
-		m_DM_currentRadius = m_DM_ServerSettings.m_minRadius;
+		m_DmCurrentTrail = m_DM_ServerSettings.m_trails.Get(Math.RandomInt(0, m_DM_ServerSettings.m_trails.Count()));
+		m_DM_currentRadius = m_DmCurrentTrail.m_minRadius;
 		
 		// Weapons
 		path = "$profile:DM\\Weapons.json";
@@ -121,17 +130,31 @@ modded class MissionServer
 	{
 		array<Man> playersList();
 		GetGame().GetPlayers(playersList);		
-		m_DM_currentRadius = Math.Clamp(playersList.Count() * m_DM_ServerSettings.m_expandStep, m_DM_ServerSettings.m_minRadius, m_DM_ServerSettings.m_maxRadius);
+		m_DM_currentRadius = Math.Clamp(playersList.Count() * m_DM_ServerSettings.m_expandStep, m_DmCurrentTrail.m_minRadius, m_DmCurrentTrail.m_maxRadius);
 		
+		m_DmTrailTimer = m_DmTrailTimer + (timeslice * m_DM_ServerSettings.m_areaMoveSpeed);
+		if (m_DmTrailTimer > 10)
+		{
+			float dist = DM_GetPointsDist();
+			if (dist == 0)
+			{
+				dist = 0.1;
+			}
+			
+			m_DmTrailShift = m_DmTrailShift + (10 / dist);
+			m_DmTrailTimer = 0;
+		}
+		
+		vector dmCurPos = DM_GetAreaPos();
 		foreach (Man manObj : playersList)
 		{
 			PlayerBase player = PlayerBase.Cast(manObj);
 			if (player)
 			{
-				if (!player.m_DmIsVarsSynch || player.m_DmZoneRadius != m_DM_currentRadius)
+				if (!player.m_DmIsVarsSynch || player.m_DmZoneRadius != m_DM_currentRadius || player.m_DmCenterX != dmCurPos[0] || player.m_DmCenterZ != dmCurPos[2])
 				{
-					player.m_DmCenterX = m_DM_ServerSettings.m_center[0];
-					player.m_DmCenterZ = m_DM_ServerSettings.m_center[2];
+					player.m_DmCenterX = dmCurPos[0];
+					player.m_DmCenterZ = dmCurPos[2];
 					player.m_DmZoneRadius = m_DM_currentRadius;
 					player.m_DmIsVarsSynch = true;
 					player.SynchDmDirty();
@@ -141,6 +164,52 @@ modded class MissionServer
 		
 		super.OnUpdate(timeslice);
 	};
+	
+	float DM_GetPointsDist()
+	{
+		int start = (int)m_DmTrailShift;
+		if (start >= m_DmCurrentTrail.m_points.Count())
+		{
+			m_DmTrailShift = 0;
+			start = 0;
+		}
+		
+		int end = start + 1;
+		if (end >= m_DmCurrentTrail.m_points.Count())
+		{
+			end = 0;
+		}
+		
+		vector startPos = m_DmCurrentTrail.m_points.Get(start);
+		vector endPos = m_DmCurrentTrail.m_points.Get(end);
+		
+		startPos[1] = 0;
+		endPos[1] = 0;
+		return vector.Distance(startPos, endPos);
+	}
+	
+	vector DM_GetAreaPos()
+	{
+		int start = (int)m_DmTrailShift;
+		if (start >= m_DmCurrentTrail.m_points.Count())
+		{
+			m_DmTrailShift = 0;
+			start = 0;
+		}
+		
+		int end = start + 1;
+		if (end >= m_DmCurrentTrail.m_points.Count())
+		{
+			end = 0;
+		}
+		
+		vector startPos = m_DmCurrentTrail.m_points.Get(start);
+		vector endPos = m_DmCurrentTrail.m_points.Get(end);
+		float delta = Math.Clamp(m_DmTrailShift - start, 0, 1);
+		vector result = vector.Lerp(startPos, endPos, delta);
+		result[1] = GetGame().SurfaceY(result[0], result[2]);
+		return result;
+	}
 	
 	void DM_WeaponBuy(CallType type, ParamsReadContext ctx, PlayerIdentity sender, Object target)
 	{
@@ -262,7 +331,7 @@ modded class MissionServer
 			dmData.m_CurrentEquipment = m_DM_ConnectSyncCtx.dm_Equipments.Get(0).m_Id;
 		}
 		
-		pos = CalculateSafePos_DM(m_DM_ServerSettings.m_center, m_DM_currentRadius);
+		pos = CalculateSafePos_DM(DM_GetAreaPos(), Math.Clamp(m_DM_currentRadius - 20, 10, 10000));
 		Entity playerEnt;
 		playerEnt = GetGame().CreatePlayer(identity, characterName, pos, 0, "NONE");
 		Class.CastTo(m_player, playerEnt);

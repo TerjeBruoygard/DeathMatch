@@ -3,6 +3,8 @@ modded class PlayerBase
 	// Client vars
 	bool m_DmDataUpdated = false;
 	float m_DmZoneRadiusLast = -1;
+	float m_DmCenterXLast = 0;
+	float m_DmCenterZLast = 0;
 	
 	// Synch vars
 	bool m_DmIsVarsSynch = false;

@@ -98,11 +98,13 @@ modded class MissionGameplay
 				dmKillsText.SetText(player.m_dmPlayerData.m_Kills.ToString());
 			}
 			
-			if (player.m_DmIsVarsSynch && player.m_DmZoneRadiusLast != player.m_DmZoneRadius)
+			if (player.m_DmIsVarsSynch && (player.m_DmZoneRadiusLast != player.m_DmZoneRadius || player.m_DmCenterX != player.m_DmCenterXLast || player.m_DmCenterZ != player.m_DmCenterZLast))
 			{
 				DM_DestroyBorderParticles();
 				DM_SpawnBorderParticles(Vector(player.m_DmCenterX, 0, player.m_DmCenterZ), player.m_DmZoneRadius);
 				player.m_DmZoneRadiusLast = player.m_DmZoneRadius;
+				player.m_DmCenterXLast = player.m_DmCenterX;
+				player.m_DmCenterZLast = player.m_DmCenterZ;
 			}
 			
 			UAInput dmMenuKey = GetUApi().GetInputByName("UAToggleDeathMatchMenu");
