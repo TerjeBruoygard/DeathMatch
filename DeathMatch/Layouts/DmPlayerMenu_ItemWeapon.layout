@@ -1,0 +1,118 @@
+FrameWidgetClass rootFrame {
+ position 10 10
+ size 1000 120
+ hexactpos 1
+ vexactpos 1
+ hexactsize 1
+ vexactsize 1
+ {
+  PanelWidgetClass DM_WI_Background {
+   ignorepointer 1
+   color 0.1882 0.1569 0.1569 1
+   position 0 0
+   size 1 1
+   hexactpos 1
+   vexactpos 1
+   hexactsize 0
+   vexactsize 0
+   style rover_sim_colorable
+   {
+    TextWidgetClass DM_WI_Name {
+     ignorepointer 1
+     position 20 10
+     size 400 30
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     text "Weapon Presset Name"
+     font "gui/fonts/etelkatextpro28"
+     "exact text" 1
+     "text valign" center
+    }
+    TextWidgetClass DM_WI_Level {
+     ignorepointer 1
+     color 1 1 1 0.7059
+     position 20 50
+     size 300 30
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     text "Unlock level: 1"
+     font "gui/fonts/etelkatextpro22"
+     "exact text" 1
+     "text valign" center
+    }
+    TextWidgetClass DM_WI_Price {
+     ignorepointer 1
+     color 1 1 1 0.7059
+     position 20 80
+     size 300 30
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     text "Price: 100$"
+     font "gui/fonts/etelkatextpro22"
+     "exact text" 1
+     "text valign" center
+    }
+    ItemPreviewWidgetClass DM_WI_Preview {
+     ignorepointer 1
+     position 140 0
+     size 400 120
+     halign center_ref
+     valign center_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+    }
+    ButtonWidgetClass DM_WI_Btn {
+     color 1 1 1 0.1176
+     position 30 0
+     size 110 50
+     halign right_ref
+     valign center_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     style EmptyHighlight
+     {
+      PanelWidgetClass DM_WI_BtnBackground {
+       ignorepointer 1
+       color 0 0.6078 0.149 0.3176
+       position 0 0
+       size 1 1
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 0
+       style rover_sim_colorable
+      }
+      TextWidgetClass DM_WI_BtnText {
+       ignorepointer 1
+       color 1 1 1 0.7059
+       size 0.8 0.8
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 0
+       text "BUY"
+       font "gui/fonts/etelkatextpro22"
+       "exact text" 1
+       "size to text h" 0
+       "size to text v" 0
+       "text halign" center
+       "text valign" center
+      }
+     }
+    }
+   }
+  }
+ }
+}

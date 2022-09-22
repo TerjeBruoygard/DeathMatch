@@ -1,0 +1,16 @@
+MetaFileClass {
+ Name "{B317E22444BAFCCA}DeathMatch/Textures/mod_icon.edds"
+ Author "terje"
+ ChangeDate 212905268
+ Configurations {
+  TGAResourceClass PC {
+   SourceFile "mod_icon.tga"
+  }
+  TGAResourceClass XBOX_ONE : PC {
+  }
+  TGAResourceClass PS4 : PC {
+  }
+  TGAResourceClass LINUX : PC {
+  }
+ }
+}

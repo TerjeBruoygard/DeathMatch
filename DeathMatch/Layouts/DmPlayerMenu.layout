@@ -1,0 +1,275 @@
+FrameWidgetClass rootFrame {
+ position 0 0
+ size 1 1
+ halign center_ref
+ valign center_ref
+ hexactpos 1
+ vexactpos 1
+ hexactsize 0
+ vexactsize 0
+ {
+  PanelWidgetClass PageTabWeapons {
+   visible 1
+   ignorepointer 1
+   color 1 1 1 0.7843
+   position -453 -425
+   size 294 50
+   halign center_ref
+   valign center_ref
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   style rover_sim_blackbox
+   {
+    ButtonWidgetClass TextWidget0 {
+     ignorepointer 0
+     size 1 0.8
+     halign center_ref
+     valign center_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     style Empty
+     text "Weapons"
+     font "gui/fonts/etelkatextpro22"
+    }
+   }
+  }
+  PanelWidgetClass PageTabEquipments {
+   visible 1
+   ignorepointer 1
+   color 1 1 1 0.7843
+   position -153 -425
+   size 294 50
+   halign center_ref
+   valign center_ref
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   style rover_sim_blackbox
+   {
+    ButtonWidgetClass TextWidget1 {
+     ignorepointer 0
+     size 1 0.8
+     halign center_ref
+     valign center_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     style Empty
+     text "Equipment"
+     font "gui/fonts/etelkatextpro22"
+    }
+   }
+  }
+  PanelWidgetClass PageTabFriends {
+   visible 0
+   ignorepointer 1
+   color 1 1 1 0.7843
+   position 147 -425
+   size 294 50
+   halign center_ref
+   valign center_ref
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   style rover_sim_blackbox
+   {
+    ButtonWidgetClass TextWidget2 {
+     ignorepointer 0
+     size 1 0.8
+     halign center_ref
+     valign center_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     style Empty
+     text "Friends"
+     font "gui/fonts/etelkatextpro22"
+    }
+   }
+  }
+  PanelWidgetClass PageBodyBack {
+   visible 1
+   ignorepointer 1
+   position 0 0
+   size 1200 800
+   halign center_ref
+   valign center_ref
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   style rover_sim_blackbox
+   {
+    PanelWidgetClass PageBodyWeapons {
+     ignorepointer 1
+     position 0 0
+     size 1 1
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     {
+      ScrollWidgetClass PageBodyWeaponsScroll {
+       ignorepointer 0
+       position 0 30
+       size 1140 700
+       halign center_ref
+       valign bottom_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       "Scrollbar V" 1
+      }
+      TextWidgetClass PageBodyWeaponsLevel {
+       ignorepointer 1
+       position 30 10
+       size 500 48
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text "Your level: 1"
+       font "gui/fonts/etelkatextpro22"
+       "exact text" 1
+       "text valign" center
+      }
+      PanelWidgetClass PageBodyWeaponsMoneyPanel {
+       ignorepointer 1
+       position 30 20
+       size 250 32
+       halign right_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       {
+        ImageWidgetClass PageBodyWeaponsMoneyIcon {
+         ignorepointer 1
+         position 0 0
+         size 32 32
+         halign right_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         fixaspect fixwidth
+         image0 "set:dm_gui image:dm_money"
+         mode blend
+         "src alpha" 1
+        }
+        TextWidgetClass PageBodyWeaponsMoneyText {
+         ignorepointer 1
+         position 40 0
+         size 1 1
+         halign right_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 0
+         text "0"
+         font "gui/fonts/etelkatextpro16"
+         "text halign" right
+         "text valign" center
+        }
+       }
+      }
+     }
+    }
+    PanelWidgetClass PageBodyEquipments {
+     ignorepointer 1
+     position 0 0
+     size 1 1
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     {
+      ScrollWidgetClass PageBodyEquipmentsScroll {
+       ignorepointer 0
+       position 0 30
+       size 1140 700
+       halign center_ref
+       valign bottom_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       "Scrollbar V" 1
+      }
+      TextWidgetClass PageBodyEquipmentsLevel {
+       ignorepointer 1
+       position 30 10
+       size 500 48
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text "Your level: 1"
+       font "gui/fonts/etelkatextpro22"
+       "exact text" 1
+       "text valign" center
+      }
+      PanelWidgetClass PageBodyEquipmentsMoneyPanel {
+       ignorepointer 1
+       position 30 20
+       size 250 32
+       halign right_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       {
+        ImageWidgetClass PageBodyEquipmentsMoneyIcon {
+         ignorepointer 1
+         position 0 0
+         size 32 32
+         halign right_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         fixaspect fixwidth
+         image0 "set:dm_gui image:dm_money"
+         mode blend
+         "src alpha" 1
+        }
+        TextWidgetClass PageBodyEquipmentsMoneyText {
+         ignorepointer 1
+         position 40 0
+         size 1 1
+         halign right_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 0
+         text "0"
+         font "gui/fonts/etelkatextpro16"
+         "text halign" right
+         "text valign" center
+        }
+       }
+      }
+     }
+    }
+    PanelWidgetClass PageBodyFriends {
+     ignorepointer 1
+     position 0 0
+     size 1 1
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,16 @@
+MetaFileClass {
+ Name "{B317EFF444BAFCCA}DeathMatch/Textures/dm_gui.edds"
+ Author "terje"
+ ChangeDate -1014223563
+ Configurations {
+  TGAResourceClass PC {
+   SourceFile "dm_gui.tga"
+  }
+  TGAResourceClass XBOX_ONE : PC {
+  }
+  TGAResourceClass PS4 : PC {
+  }
+  TGAResourceClass LINUX : PC {
+  }
+ }
+}

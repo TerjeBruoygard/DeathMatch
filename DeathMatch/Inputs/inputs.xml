@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<modded_inputs>
+	<!-- declarations -->
+	<inputs>
+		<actions>
+			<input name="UAToggleDeathMatchMenu" loc="Open deathmatch menu" />
+		</actions>
+	</inputs>
+
+	<!-- presets -->
+	<preset>
+        <input name="UAToggleDeathMatchMenu">
+            <btn name="kO" />
+        </input>
+	</preset>
+</modded_inputs>

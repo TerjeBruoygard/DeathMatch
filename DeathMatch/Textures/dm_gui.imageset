@@ -1,0 +1,50 @@
+ImageSetClass {
+ Name "dm_gui"
+ RefSize 512 512
+ Textures {
+  ImageSetTextureClass {
+   mpix 1
+   path "{4D3CD32050B3966B}DeathMatch/Textures/dm_gui.edds"
+  }
+ }
+ Images {
+  ImageSetDefClass dm_money {
+   Name "dm_money"
+   Pos 0 0
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass dm_kill {
+   Name "dm_kill"
+   Pos 84 0
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass dm_death {
+   Name "dm_death"
+   Pos 167 0
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass dm_buy {
+   Name "dm_buy"
+   Pos 209 103
+   Size 80 80
+   Flags 0
+  }
+  ImageSetDefClass dm_apply {
+   Name "dm_apply"
+   Pos 103 103
+   Size 80 80
+   Flags 0
+  }
+  ImageSetDefClass dm_cancel {
+   Name "dm_cancel"
+   Pos 0 103
+   Size 80 80
+   Flags 0
+  }
+ }
+ Groups {
+ }
+}
