@@ -2,8 +2,10 @@ modded class MissionGameplay
 {
 	ref DmPlayerMenu m_dmPlayerMenu = null;
 	ref array<Particle> m_DM_area_particles = new array<Particle>;
+	ref array<Widget> m_DmKillFeedItems = new array<Widget>;
 	Widget m_DmHud;
-	float m_WarningBlinkTimer = 0;
+	float m_DmWarningBlinkTimer = 0;
+	float m_DmKillfeedClean = 10;
 	
 	override void OnInit()
 	{
@@ -14,6 +16,8 @@ modded class MissionGameplay
 			m_DmHud = GetGame().GetWorkspace().CreateWidgets("DeathMatch/Layouts/DmHud.layout", m_HudRootWidget);
 			m_DmHud.Show(false);
 		}
+		
+		GetRPCManager().AddRPC("DM", "DM_KillFeed", this, SingleplayerExecutionType.Client);
 	}
 	
 	override void OnMissionStart()
@@ -23,8 +27,14 @@ modded class MissionGameplay
 	
 	override void OnMissionFinish()
 	{
-		super.OnMissionFinish();
+		while (m_DmKillFeedItems.Count() > 0)
+		{
+			DM_PopKillFeed();
+		}
+		
 		DM_DestroyBorderParticles();
+		super.OnMissionFinish();
+		
 	}
 	
 	override void OnKeyRelease(int key)
@@ -54,13 +64,13 @@ modded class MissionGameplay
 			{
 				if (player.DM_GetDistanceInZone() > 0)
 				{
-					m_WarningBlinkTimer = m_WarningBlinkTimer + (timeslice * 3);
-					dmOutsideWarning.Show( ((int)m_WarningBlinkTimer) % 2 == 0 );
+					m_DmWarningBlinkTimer = m_DmWarningBlinkTimer + (timeslice * 3);
+					dmOutsideWarning.Show( ((int)m_DmWarningBlinkTimer) % 2 == 0 );
 				}
 				else
 				{
 					dmOutsideWarning.Show(false);
-					m_WarningBlinkTimer = 0;
+					m_DmWarningBlinkTimer = 0;
 				}
 			}
 			
@@ -143,8 +153,118 @@ modded class MissionGameplay
 				player.m_DmDataUpdated = false;
 				m_dmPlayerMenu.m_dirty = true;
 			}
+			
+			m_DmKillfeedClean = m_DmKillfeedClean - timeslice;
+			if (m_DmKillfeedClean <= 0)
+			{
+				m_DmKillfeedClean = 10;
+				DM_PopKillFeed();
+			}
 		}
 	};
+	
+	void DM_PopKillFeed()
+	{
+		if (m_DmKillFeedItems.Count() == 0)
+		{
+			return;
+		}
+		
+		float x, y, w, h;
+		EntityAI wpnObject;
+		Widget item = m_DmKillFeedItems.Get(0);
+		item.GetSize(w, h);
+		
+		if (item)
+		{
+			item.GetUserData(wpnObject);
+			if (wpnObject)
+			{
+				GetGame().ObjectDelete(wpnObject);
+			}
+			
+			m_HudRootWidget.RemoveChild(item);
+		}
+		
+		m_DmKillFeedItems.Remove(0);
+		foreach (Widget widget : m_DmKillFeedItems)
+		{
+			widget.GetPos(x, y);
+			widget.SetPos(x, y - (h + 4));
+		}
+	}
+	
+	void DM_KillFeed(CallType type, ParamsReadContext ctx, PlayerIdentity sender, Object target)
+	{
+		if (type != CallType.Client)
+		{
+			return;
+		}
+		
+		Param3<string, string, string> data;
+		if (!ctx.Read(data))
+		{
+			return;
+		}
+		
+		PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
+		if (!player)
+		{
+			return;
+		}
+		
+		if (!player.m_dmConnectSyncCtx)
+		{
+			return;
+		}
+		
+		ref DmWeaponPresset wpnData = player.m_dmConnectSyncCtx.FindWeaponPresset(data.param3);
+		if (!wpnData)
+		{
+			return;
+		}
+		
+		if (m_DmKillFeedItems.Count() > 4)
+		{
+			DM_PopKillFeed();
+		}
+		
+		float x, y, w, h;
+		int count = m_DmKillFeedItems.Count();
+		Widget item = GetGame().GetWorkspace().CreateWidgets( "DeathMatch/Layouts/DmKillMessage.layout", m_HudRootWidget );
+		item.GetPos(x, y);
+		item.GetSize(w, h);
+		item.SetPos(x, y + ((h + 4) * count));
+		
+		TextWidget.Cast(item.FindAnyWidget("DM_Src")).SetText(data.param1);
+		TextWidget.Cast(item.FindAnyWidget("DM_Dst")).SetText(data.param2);
+		
+		Weapon_Base itemObject = Weapon_Base.Cast( GetGame().CreateObject(wpnData.m_Classname, "0 0 0", true, false, false) );
+		if (itemObject)
+		{			
+			item.SetUserData(itemObject);	
+			if (wpnData.m_Magazine != "")
+			{
+				itemObject.CF_SpawnMagazine(wpnData.m_Magazine);
+			}
+
+			if (wpnData.m_Attachments && wpnData.m_Attachments.Count() > 0)
+			{
+				foreach (string attClassname : wpnData.m_Attachments)
+				{
+					itemObject.GetInventory().CreateAttachment(attClassname);
+				}
+			}
+							
+			ItemPreviewWidget previewWidget = ItemPreviewWidget.Cast(item.FindAnyWidget("DM_Wpn"));
+			previewWidget.SetItem(itemObject);
+			previewWidget.SetView(itemObject.GetViewIndex());
+			previewWidget.SetModelPosition(Vector(0,0,0.25));
+		}
+		
+		m_DmKillFeedItems.Insert(item);
+		m_DmKillfeedClean = 10;
+	}
 	
 	void DM_SpawnBorderParticles(vector center, float radius)
 	{

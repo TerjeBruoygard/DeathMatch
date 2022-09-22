@@ -126,8 +126,13 @@ modded class PlayerBase
 				m_dmPlayerData.m_Level = m_dmPlayerData.m_Level + 1;
 			}
 			
+			int distance = (int)Math.Round(vector.Distance(GetWorldPosition(), murder.GetWorldPosition()));
+			string srcName = GetIdentity().GetName() + " (" + distance.ToString() + "m)";
+			string dstName = murder.GetIdentity().GetName();
+			GetRPCManager().SendRPC("DM", "DM_KillFeed", new Param3<string, string, string>(srcName, dstName, m_dmPlayerData.m_CurrentWeapon), true, null); 
 			SetHealth01("GlobalHealth", "Health", 1.0);
 			SynchDmPlayerDataDirty();
+			SetSynchDirty();
 		}
 	}
 	
@@ -201,6 +206,7 @@ modded class PlayerBase
 		if (blood < maxBlood - 100)
 		{
 			SetHealth("GlobalHealth", "Blood", maxBlood);
+			SetSynchDirty();
 		}
 		
 		float shock = GetHealth("GlobalHealth", "Shock");
@@ -208,6 +214,7 @@ modded class PlayerBase
 		if (shock < maxShock - 10)
 		{
 			SetHealth("GlobalHealth", "Shock", maxShock);
+			SetSynchDirty();
 		}
 		
 		if (GetBleedingSourceCount() > 0 && m_BleedingManagerServer)
@@ -254,11 +261,10 @@ modded class PlayerBase
 			GetInventory().EnumerateInventory(InventoryTraversalType.PREORDER, items);
 			foreach (auto item : items)
 			{
-				Weapon wpn = Weapon.Cast(item);
-				if (wpn && wpn.GetHealth01("", "") < 0.8)
+				ItemBase itemBase = ItemBase.Cast(item);
+				if (itemBase && itemBase.GetHealth01("", "") < 0.75)
 				{
-					wpn.SetHealth01("", "", 1);
-					continue;
+					itemBase.SetHealth01("", "", 1.0);
 				}
 				
 				Magazine mag = Magazine.Cast(item);

@@ -34,6 +34,7 @@ modded class MissionServer
 		JsonFileLoader<ref DM_ServerSettings>.JsonSaveFile(path, m_DM_ServerSettings);
 		m_DmCurrentTrail = m_DM_ServerSettings.m_trails.Get(Math.RandomInt(0, m_DM_ServerSettings.m_trails.Count()));
 		m_DM_currentRadius = m_DmCurrentTrail.m_minRadius;
+		m_DmTrailShift = Math.RandomFloat01() * (m_DmCurrentTrail.m_points.Count() - 1);
 		
 		// Weapons
 		path = "$profile:DM\\Weapons.json";

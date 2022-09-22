@@ -1,0 +1,47 @@
+FrameWidgetClass rootFrame {
+ size 500 30
+ halign right_ref
+ hexactpos 1
+ vexactpos 1
+ hexactsize 1
+ vexactsize 1
+ {
+  TextWidgetClass DM_Src {
+   ignorepointer 1
+   position 0 0
+   size 200 30
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   text "Killer nickname"
+   font "gui/fonts/etelkatextpro16"
+   "exact text" 1
+   "text halign" right
+   "text valign" center
+  }
+  TextWidgetClass DM_Dst {
+   ignorepointer 1
+   size 180 30
+   halign right_ref
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   text "Murder nickname"
+   font "gui/fonts/etelkatextpro16"
+   "exact text" 1
+   "text valign" center
+  }
+  ItemPreviewWidgetClass DM_Wpn {
+   ignorepointer 1
+   position 10 0
+   size 100 30
+   halign center_ref
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+  }
+ }
+}
