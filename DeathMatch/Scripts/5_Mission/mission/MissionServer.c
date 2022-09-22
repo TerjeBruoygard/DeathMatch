@@ -85,7 +85,6 @@ modded class MissionServer
 		
 		GetRPCManager().AddRPC("DM", "DM_WeaponBuy", this, SingleplayerExecutionType.Server);
 		GetRPCManager().AddRPC("DM", "DM_EquipmentBuy", this, SingleplayerExecutionType.Server);
-		GetRPCManager().AddRPC("DM", "DM_PReady", this, SingleplayerExecutionType.Server);
 	};
 	
 	override void OnMissionFinish()
@@ -143,28 +142,6 @@ modded class MissionServer
 		super.OnUpdate(timeslice);
 	};
 	
-	void DM_PReady(CallType type, ParamsReadContext ctx, PlayerIdentity sender, Object target)
-	{
-		if (type != CallType.Server)
-		{
-			return;
-		}
-		
-		DM_Log("DM_PReady 1: " + sender.GetName() + " => " + sender.GetId());
-		
-		PlayerBase player = FindPlayer_DM(sender);
-		if (!player || !player.IsAlive())
-		{
-			return;
-		}
-		
-		DM_Log("DM_PReady 2: " + player.GetIdentity().GetName() + " => " + player.GetIdentity().GetId());
-		
-		ref Param1<ref DmConnectSyncContext> rpcCtx = new Param1<ref DmConnectSyncContext>(player.m_dmConnectSyncCtx);
-		GetRPCManager().SendRPC("DM", "DM_PSynchInfo", rpcCtx, true, sender);
-		player.m_DmPlayerReady = true;
-	};
-	
 	void DM_WeaponBuy(CallType type, ParamsReadContext ctx, PlayerIdentity sender, Object target)
 	{
 		if (type != CallType.Server)
@@ -181,15 +158,13 @@ modded class MissionServer
 			return;
 		}
 		
-		DM_Log("DM_WeaponBuy 1: " + sender.GetName() + " => " + sender.GetId());
-		
-		PlayerBase player = FindPlayer_DM(sender);
+		PlayerBase player = PlayerBase.Cast(target);
 		if (!player || !player.IsAlive())
 		{
 			return;
 		}
-		
-		DM_Log("DM_WeaponBuy 2: " + player.GetIdentity().GetName() + " => " + player.GetIdentity().GetId());
+
+		DM_Log("DM_WeaponBuy: " + sender.GetName() + ": " + sender.GetId() + " => " + wpnData.m_Name);
 		
 		if (player.m_dmPlayerData.IsWeaponLocked(wpnData))
 		{
@@ -227,11 +202,13 @@ modded class MissionServer
 			return;
 		}
 		
-		PlayerBase player = FindPlayer_DM(sender);
+		PlayerBase player = PlayerBase.Cast(target);
 		if (!player || !player.IsAlive())
 		{
 			return;
 		}
+		
+		DM_Log("DM_WeaponBuy: " + sender.GetName() + ": " + sender.GetId() + " => " + eqpData.m_Name);
 		
 		if (player.m_dmPlayerData.IsEquipmentLocked(eqpData))
 		{
@@ -286,25 +263,29 @@ modded class MissionServer
 		}
 		
 		pos = CalculateSafePos_DM(m_DM_ServerSettings.m_center, m_DM_currentRadius);
-		PlayerBase player = super.CreateCharacter(identity, pos, ctx, characterName);
-		player.m_dmServerSettings = m_DM_ServerSettings;
-		player.m_dmPlayerData = dmData;
-		player.m_dmConnectSyncCtx = m_DM_ConnectSyncCtx;
-		player.SynchDmPlayerDataDirty();
+		Entity playerEnt;
+		playerEnt = GetGame().CreatePlayer(identity, characterName, pos, 0, "NONE");
+		Class.CastTo(m_player, playerEnt);
+		GetGame().SelectPlayer(identity, m_player);
+		
+		m_player.m_dmServerSettings = m_DM_ServerSettings;
+		m_player.m_dmPlayerData = dmData;
+		m_player.m_dmConnectSyncCtx = m_DM_ConnectSyncCtx;
+		m_player.SynchDmPlayerDataDirty();
 		
 		ref DmEquipmentPresset eqpData = m_DM_ConnectSyncCtx.FindEquipmentPresset(dmData.m_CurrentEquipment);
 		if (eqpData)
 		{
-			EquipPlayerClothing_DM(player, eqpData);
+			EquipPlayerClothing_DM(m_player, eqpData);
 		}
 		
 		ref DmWeaponPresset wpnData = m_DM_ConnectSyncCtx.FindWeaponPresset(dmData.m_CurrentWeapon);
 		if (wpnData)
 		{
-			EquipPlayerWeapon_DM(player, wpnData);
+			EquipPlayerWeapon_DM(m_player, wpnData);
 		}
 		
-		return player;
+		return m_player;
 	};
 	
 	override void EquipCharacter(MenuDefaultCharacterData char_data)
@@ -361,25 +342,6 @@ modded class MissionServer
 			weapon.CF_SpawnMagazine(wp.m_Magazine);
 			player.GetInventory().CreateInInventory(wp.m_Magazine);
 		}
-	}
-	
-	PlayerBase FindPlayer_DM(PlayerIdentity identity)
-	{
-		array<Man> playersList();
-		GetGame().GetPlayers(playersList);	
-		foreach (Man manObj : playersList)
-		{
-			if (manObj)
-			{
-				PlayerBase player = PlayerBase.Cast(manObj);
-				if (player && player.GetIdentity().GetId() == identity.GetId())
-				{
-					return player;
-				}
-			}
-		}
-
-		return null;
 	}
 	
 	vector CalculateSafePos_DM(vector center, float radius)

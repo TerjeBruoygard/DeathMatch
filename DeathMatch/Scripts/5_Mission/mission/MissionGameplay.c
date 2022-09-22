@@ -14,96 +14,6 @@ modded class MissionGameplay
 			m_DmHud = GetGame().GetWorkspace().CreateWidgets("DeathMatch/Layouts/DmHud.layout", m_HudRootWidget);
 			m_DmHud.Show(false);
 		}
-		
-		GetRPCManager().AddRPC("DM", "DM_PSynchStat", this, SingleplayerExecutionType.Client);
-		GetRPCManager().AddRPC("DM", "DM_PSynchData", this, SingleplayerExecutionType.Client);
-		GetRPCManager().AddRPC("DM", "DM_PSynchInfo", this, SingleplayerExecutionType.Client);
-	}
-	
-	void DM_PSynchStat(CallType type, ParamsReadContext ctx, PlayerIdentity sender, Object target)
-	{
-		if (type != CallType.Client)
-		{
-			return;
-		}
-		
-		if (sender != null)
-		{
-			return;
-		}
-		
-		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
-		if (player)
-		{
-			if (player.IsAlive())
-			{
-				player.DM_PSynchStat(ctx);
-				DM_Log("DM_PSynchStat - OK");
-			}
-		}
-		else
-		{
-			DM_Log("DM_PSynchStat player not found.");
-		}
-	}
-	
-	void DM_PSynchData(CallType type, ParamsReadContext ctx, PlayerIdentity sender, Object target)
-	{
-		if (type != CallType.Client)
-		{
-			return;
-		}
-		
-		if (sender != null)
-		{
-			return;
-		}
-		
-		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
-		if (player)
-		{
-			if (player.IsAlive())
-			{
-				player.DM_PSynchData(ctx);
-				DM_Log("DM_PSynchData - OK");
-				
-				if (m_dmPlayerMenu && m_dmPlayerMenu.m_active && player.m_dmConnectSyncCtx) 
-				{
-					m_dmPlayerMenu.m_dirty = true;
-				}
-			}
-		}
-		else
-		{
-			DM_Log("DM_PSynchData player not found.");
-		}
-	}
-	
-	void DM_PSynchInfo(CallType type, ParamsReadContext ctx, PlayerIdentity sender, Object target)
-	{
-		if (type != CallType.Client)
-		{
-			return;
-		}
-		
-		if (sender != null)
-		{
-			return;
-		}
-		
-		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
-		if (player)
-		{
-			if (player.IsAlive())
-			{
-				player.DM_PSynchInfo(ctx);
-				DM_Log("DM_PSynchInfo - OK");
-			}
-		}
-		else
-		{
-			DM_Log("DM_PSynchInfo player not found.");
-		}
 	}
 	
 	override void OnMissionStart()
@@ -224,6 +134,12 @@ modded class MissionGameplay
 		
 					GetGame().GetUIManager().ShowScriptedMenu( m_dmPlayerMenu, NULL );
 				}
+			}
+			
+			if (player.m_DmDataUpdated && m_dmPlayerMenu && m_dmPlayerMenu.m_active && player.m_dmConnectSyncCtx) 
+			{
+				player.m_DmDataUpdated = false;
+				m_dmPlayerMenu.m_dirty = true;
 			}
 		}
 	};

@@ -1,10 +1,10 @@
 modded class PlayerBase
 {
 	// Client vars
+	bool m_DmDataUpdated = false;
 	float m_DmZoneRadiusLast = -1;
 	
 	// Synch vars
-	bool m_DmPlayerReady = false;
 	bool m_DmIsVarsSynch = false;
 	float m_DmCenterX;
 	float m_DmCenterZ;
@@ -14,6 +14,7 @@ modded class PlayerBase
 	ref DmConnectSyncContext m_dmConnectSyncCtx = null;
 	
 	// Server vars
+	bool m_DmPlayerReady = false;
 	bool m_DmSynchDirty = false;
 	bool m_DmPlayerDataSynchDirty = false;
 	float m_DmSynchTimer = 1000;
@@ -22,29 +23,33 @@ modded class PlayerBase
 	EntityAI m_lastDamageSource = NULL;
 	ref DM_ServerSettings m_dmServerSettings = null;
 	
-	void DM_PSynchStat(ParamsReadContext ctx)
+	override void OnRPC(PlayerIdentity sender, int rpc_type, ParamsReadContext ctx)
 	{
-		ref Param4<float, float, float, int> dmContext = new Param4<float, float, float, int>(0, 0, 0, 0);
-		ctx.Read( dmContext );
-		m_DmIsVarsSynch = true;
-		m_DmCenterX = dmContext.param1;
-		m_DmCenterZ = dmContext.param2;
-		m_DmZoneRadius = dmContext.param3;
-		m_DmHealthValue = dmContext.param4;
-	}
-	
-	void DM_PSynchData(ParamsReadContext ctx)
-	{
-		ref Param1<ref DmPlayerData> dmPlayerDataContext = new Param1<ref DmPlayerData>(null);
-		ctx.Read( dmPlayerDataContext );
-		m_dmPlayerData = dmPlayerDataContext.param1;
-	}
-	
-	void DM_PSynchInfo(ParamsReadContext ctx)
-	{
-		ref Param1<ref DmConnectSyncContext> dmConnSyncCtx = new Param1<ref DmConnectSyncContext>(null);
-		ctx.Read( dmConnSyncCtx );
-		m_dmConnectSyncCtx = dmConnSyncCtx.param1;
+		super.OnRPC(sender, rpc_type, ctx);
+		
+		if (rpc_type == 14880011)
+		{
+			ref Param4<float, float, float, int> dmContext = new Param4<float, float, float, int>(0, 0, 0, 0);
+			ctx.Read( dmContext );
+			m_DmIsVarsSynch = true;
+			m_DmCenterX = dmContext.param1;
+			m_DmCenterZ = dmContext.param2;
+			m_DmZoneRadius = dmContext.param3;
+			m_DmHealthValue = dmContext.param4;
+		}
+		else if (rpc_type == 14880022)
+		{
+			ref Param1<ref DmPlayerData> dmPlayerDataContext = new Param1<ref DmPlayerData>(null);
+			ctx.Read( dmPlayerDataContext );
+			m_dmPlayerData = dmPlayerDataContext.param1;
+			m_DmDataUpdated = true;
+		}
+		else if (rpc_type == 14880033)
+		{
+			ref Param1<ref DmConnectSyncContext> dmConnSyncCtx = new Param1<ref DmConnectSyncContext>(null);
+			ctx.Read( dmConnSyncCtx );
+			m_dmConnectSyncCtx = dmConnSyncCtx.param1;
+		}
 	}
 	
 	void SynchDmDirty()
@@ -61,17 +66,11 @@ modded class PlayerBase
 	{
 		super.OnScheduledTick(deltaTime);
 		
-		if (m_DmPlayerReady && GetGame().IsServer() && IsAlive())
+		if (GetGame().IsServer() && IsAlive())
 		{
 			DM_RefillStats(deltaTime);
 			DM_RefillMags(deltaTime);
 			DM_Synch(deltaTime);
-		}
-		
-		if (!m_DmPlayerReady && GetGame().IsClient() && IsAlive())
-		{
-			GetRPCManager().SendRPC("DM", "DM_PReady", new Param1<int>(0), true);
-			m_DmPlayerReady = true;
 		}
 	}
 	
@@ -129,20 +128,29 @@ modded class PlayerBase
 	}
 	
 	override void EEKilled( Object killer )
-	{
-		PlayerBase killerPlayer = PlayerBase.Cast(killer);
-		if (killerPlayer != null && killerPlayer != this)
+	{	
+		EntityAI killerEntity = EntityAI.Cast(killer);
+		if (killerEntity != null)
 		{
-			this.DM_OnDead(killerPlayer);
-			killerPlayer.DM_OnKill(this);
-		}
-		else if (m_lastDamageSource != null)
-		{
-			killerPlayer = PlayerBase.Cast(m_lastDamageSource);
+			PlayerBase killerPlayer = PlayerBase.Cast(killerEntity);
+			if (!killerPlayer)
+			{
+				killerPlayer = PlayerBase.Cast(killerEntity.GetHierarchyRootPlayer());
+			}
+			
 			if (killerPlayer != null && killerPlayer != this)
 			{
 				this.DM_OnDead(killerPlayer);
 				killerPlayer.DM_OnKill(this);
+			}
+			else if (m_lastDamageSource != null)
+			{
+				killerPlayer = PlayerBase.Cast(m_lastDamageSource);
+				if (killerPlayer != null && killerPlayer != this)
+				{
+					this.DM_OnDead(killerPlayer);
+					killerPlayer.DM_OnKill(this);
+				}
 			}
 		}
 		
@@ -153,9 +161,18 @@ modded class PlayerBase
 	
 	override void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos, float speedCoef)
 	{
-		if (IsAlive() && this != source)
+		if (source)
 		{
-			m_lastDamageSource = source;
+			PlayerBase sourcePlayer = PlayerBase.Cast(source);
+			if (!sourcePlayer)
+			{
+				sourcePlayer = PlayerBase.Cast(source.GetHierarchyRootPlayer());
+			}
+			
+			if (sourcePlayer && IsAlive() && this != sourcePlayer)
+			{
+				m_lastDamageSource = source;
+			}
 		}
 		
 		super.EEHitBy(damageResult, damageType, source, component, dmgZone, ammo, modelPos, speedCoef);
@@ -272,12 +289,19 @@ modded class PlayerBase
 		m_DmSynchTimer = m_DmSynchTimer + deltaTime;
 		m_DmPlayerDataSynchTimer = m_DmPlayerDataSynchTimer + deltaTime;
 		
+		if (!m_DmPlayerReady)
+		{
+			m_DmPlayerReady = true;
+			ref Param1<ref DmConnectSyncContext> rpcConnCtx = new Param1<ref DmConnectSyncContext>(m_dmConnectSyncCtx);
+			RPCSingleParam(14880033, rpcConnCtx, true, GetIdentity());
+		}
+		
 		if (m_DmSynchDirty && m_DmSynchTimer > 1.0)
 		{
 			m_DmSynchTimer = 0;
 			m_DmSynchDirty = false;
 			ref Param4<float, float, float, int> dmContext = new Param4<float, float, float, int>(m_DmCenterX, m_DmCenterZ, m_DmZoneRadius, m_DmHealthValue);
-			GetRPCManager().SendRPC("DM", "DM_PSynchStat", dmContext, true, GetIdentity());
+			RPCSingleParam(14880011, dmContext, true, GetIdentity());
 		}
 		
 		if (m_DmPlayerDataSynchDirty && m_DmPlayerDataSynchTimer > 1.0)
@@ -285,7 +309,7 @@ modded class PlayerBase
 			m_DmPlayerDataSynchTimer = 0;
 			m_DmPlayerDataSynchDirty = false;
 			ref Param1<ref DmPlayerData> dmPlayerDataContext = new Param1<ref DmPlayerData>(m_dmPlayerData);
-			GetRPCManager().SendRPC("DM", "DM_PSynchData", dmPlayerDataContext, true, GetIdentity());
+			RPCSingleParam(14880022, dmPlayerDataContext, true, GetIdentity());
 		}
 	}
 };

@@ -313,7 +313,7 @@ class DmPlayerMenu extends UIScriptedMenu
 					w.GetUserData(dmWp);
 					if (dmWp)
 					{
-						GetRPCManager().SendRPC("DM", "DM_WeaponBuy", new Param1<string>(dmWp.m_Id), true); 
+						GetRPCManager().SendRPC("DM", "DM_WeaponBuy", new Param1<string>(dmWp.m_Id), true, null, GetGame().GetPlayer()); 
 					}
 				}
 			}
@@ -325,7 +325,7 @@ class DmPlayerMenu extends UIScriptedMenu
 					w.GetUserData(dmEp);
 					if (dmEp)
 					{
-						GetRPCManager().SendRPC("DM", "DM_EquipmentBuy", new Param1<string>(dmEp.m_Id), true); 
+						GetRPCManager().SendRPC("DM", "DM_EquipmentBuy", new Param1<string>(dmEp.m_Id), true, null, GetGame().GetPlayer()); 
 					}
 				}
 			}
