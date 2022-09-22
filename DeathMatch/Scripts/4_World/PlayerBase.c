@@ -22,6 +22,7 @@ modded class PlayerBase
 	float m_DmSynchTimer = 1000;
 	float m_DmPlayerDataSynchTimer = 1000;
 	float m_RefillMagsTimer = 0;
+	float m_DmHealthRegenTimeout = 0;
 	EntityAI m_lastDamageSource = NULL;
 	ref DM_ServerSettings m_dmServerSettings = null;
 	
@@ -125,6 +126,7 @@ modded class PlayerBase
 				m_dmPlayerData.m_Level = m_dmPlayerData.m_Level + 1;
 			}
 			
+			SetHealth01("GlobalHealth", "Health", 1.0);
 			SynchDmPlayerDataDirty();
 		}
 	}
@@ -177,11 +179,13 @@ modded class PlayerBase
 			}
 		}
 		
+		m_DmHealthRegenTimeout = m_dmServerSettings.m_healthRegenTimeoutOnHit;
 		super.EEHitBy(damageResult, damageType, source, component, dmgZone, ammo, modelPos, speedCoef);
 	}
 	
 	void DM_RefillStats(float deltaTime)
 	{
+		m_DmHealthRegenTimeout = Math.Clamp(m_DmHealthRegenTimeout - deltaTime, 0, 100000);
 		if (GetStatWater().Get() < GetStatWater().GetMax() - 100)
 		{
 			GetStatWater().Set(GetStatWater().GetMax());
@@ -226,7 +230,7 @@ modded class PlayerBase
 		{
 			DecreaseHealth("GlobalHealth", "Health", deltaTime * dmDistInZone * m_dmServerSettings.m_healthOutOfZoneDmg);
 		}
-		else
+		else if (m_DmHealthRegenTimeout < 0.1)
 		{
 			AddHealth("GlobalHealth", "Health", deltaTime * m_dmServerSettings.m_healthRegen);
 		}

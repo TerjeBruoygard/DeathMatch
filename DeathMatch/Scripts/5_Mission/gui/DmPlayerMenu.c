@@ -104,15 +104,27 @@ class DmPlayerMenu extends UIScriptedMenu
 			item.SetPos(0, (h + 2) * i);
 			item.SetSize(contentWidth - 5, h);
 			
-			if (player.m_dmPlayerData.IsEquipmentLocked(wpnData))
+			if (player.m_dmPlayerData.ContainsEquipment(player.m_dmConnectSyncCtx, wpnData.m_Id))
+			{
+				if (player.m_dmPlayerData.IsEquipmentSelected(wpnData))
+				{
+					item.FindAnyWidget("DM_WI_Background").SetColor(ARGB(255, 40, 48, 40));
+					item.FindAnyWidget("DM_WI_Price").Show(false);
+					item.FindAnyWidget("DM_WI_Btn").Show(false);
+				}
+				else
+				{
+					item.FindAnyWidget("DM_WI_Btn").SetUserData(wpnData);
+					item.FindAnyWidget("DM_WI_Btn").SetUserID(2001);
+					item.FindAnyWidget("DM_WI_Background").SetColor(ARGB(255, 40, 40, 40));
+					item.FindAnyWidget("DM_WI_Price").Show(false);
+					item.FindAnyWidget("DM_WI_BtnBackground").SetColor(ARGB(81, 0, 155, 38));
+					TextWidget.Cast(item.FindAnyWidget("DM_WI_BtnText")).SetText("USE");
+				}
+			}
+			else if (player.m_dmPlayerData.IsEquipmentLocked(wpnData))
 			{
 				item.FindAnyWidget("DM_WI_Background").SetColor(ARGB(255, 48, 40, 40));
-				item.FindAnyWidget("DM_WI_Btn").Show(false);
-			}
-			else if (player.m_dmPlayerData.IsEquipmentSelected(wpnData))
-			{
-				item.FindAnyWidget("DM_WI_Background").SetColor(ARGB(255, 40, 48, 40));
-				item.FindAnyWidget("DM_WI_Price").Show(false);
 				item.FindAnyWidget("DM_WI_Btn").Show(false);
 			}
 			else
@@ -120,17 +132,8 @@ class DmPlayerMenu extends UIScriptedMenu
 				item.FindAnyWidget("DM_WI_Btn").SetUserData(wpnData);
 				item.FindAnyWidget("DM_WI_Btn").SetUserID(2001);
 				item.FindAnyWidget("DM_WI_Background").SetColor(ARGB(255, 40, 40, 40));
-				if (player.m_dmPlayerData.ContainsEquipment(player.m_dmConnectSyncCtx, wpnData.m_Id))
-				{
-					item.FindAnyWidget("DM_WI_Price").Show(false);
-					item.FindAnyWidget("DM_WI_BtnBackground").SetColor(ARGB(81, 0, 155, 38));
-					TextWidget.Cast(item.FindAnyWidget("DM_WI_BtnText")).SetText("USE");
-				}
-				else
-				{
-					item.FindAnyWidget("DM_WI_BtnBackground").SetColor(ARGB(81, 175, 144, 49));
-					TextWidget.Cast(item.FindAnyWidget("DM_WI_BtnText")).SetText("BUY");
-				}
+				item.FindAnyWidget("DM_WI_BtnBackground").SetColor(ARGB(81, 175, 144, 49));
+				TextWidget.Cast(item.FindAnyWidget("DM_WI_BtnText")).SetText("BUY");
 			}
 			
 			TextWidget.Cast(item.FindAnyWidget("DM_WI_Name")).SetText(wpnData.m_Name);
@@ -198,15 +201,27 @@ class DmPlayerMenu extends UIScriptedMenu
 			item.SetPos(0, (h + 2) * i);
 			item.SetSize(contentWidth - 5, h);
 			
-			if (player.m_dmPlayerData.IsWeaponLocked(wpnData))
+			if (player.m_dmPlayerData.ContainsWeapon(player.m_dmConnectSyncCtx, wpnData.m_Id))
+			{
+				if (player.m_dmPlayerData.IsWeaponSelected(wpnData))
+				{
+					item.FindAnyWidget("DM_WI_Background").SetColor(ARGB(255, 40, 48, 40));
+					item.FindAnyWidget("DM_WI_Price").Show(false);
+					item.FindAnyWidget("DM_WI_Btn").Show(false);
+				}
+				else
+				{
+					item.FindAnyWidget("DM_WI_Btn").SetUserData(wpnData);
+					item.FindAnyWidget("DM_WI_Btn").SetUserID(1001);
+					item.FindAnyWidget("DM_WI_Background").SetColor(ARGB(255, 40, 40, 40));
+					item.FindAnyWidget("DM_WI_Price").Show(false);
+					item.FindAnyWidget("DM_WI_BtnBackground").SetColor(ARGB(81, 0, 155, 38));
+					TextWidget.Cast(item.FindAnyWidget("DM_WI_BtnText")).SetText("USE");
+				}
+			}
+			else if (player.m_dmPlayerData.IsWeaponLocked(wpnData))
 			{
 				item.FindAnyWidget("DM_WI_Background").SetColor(ARGB(255, 48, 40, 40));
-				item.FindAnyWidget("DM_WI_Btn").Show(false);
-			}
-			else if (player.m_dmPlayerData.IsWeaponSelected(wpnData))
-			{
-				item.FindAnyWidget("DM_WI_Background").SetColor(ARGB(255, 40, 48, 40));
-				item.FindAnyWidget("DM_WI_Price").Show(false);
 				item.FindAnyWidget("DM_WI_Btn").Show(false);
 			}
 			else
@@ -214,17 +229,8 @@ class DmPlayerMenu extends UIScriptedMenu
 				item.FindAnyWidget("DM_WI_Btn").SetUserData(wpnData);
 				item.FindAnyWidget("DM_WI_Btn").SetUserID(1001);
 				item.FindAnyWidget("DM_WI_Background").SetColor(ARGB(255, 40, 40, 40));
-				if (player.m_dmPlayerData.ContainsWeapon(player.m_dmConnectSyncCtx, wpnData.m_Id))
-				{
-					item.FindAnyWidget("DM_WI_Price").Show(false);
-					item.FindAnyWidget("DM_WI_BtnBackground").SetColor(ARGB(81, 0, 155, 38));
-					TextWidget.Cast(item.FindAnyWidget("DM_WI_BtnText")).SetText("USE");
-				}
-				else
-				{
-					item.FindAnyWidget("DM_WI_BtnBackground").SetColor(ARGB(81, 175, 144, 49));
-					TextWidget.Cast(item.FindAnyWidget("DM_WI_BtnText")).SetText("BUY");
-				}
+				item.FindAnyWidget("DM_WI_BtnBackground").SetColor(ARGB(81, 175, 144, 49));
+				TextWidget.Cast(item.FindAnyWidget("DM_WI_BtnText")).SetText("BUY");
 			}
 			
 			TextWidget.Cast(item.FindAnyWidget("DM_WI_Name")).SetText(wpnData.m_Name);
@@ -240,14 +246,20 @@ class DmPlayerMenu extends UIScriptedMenu
 			
 			Weapon_Base itemObject = Weapon_Base.Cast( GetGame().CreateObject(wpnData.m_Classname, "0 0 0", true, false, false) );
 			if (itemObject)
-			{
-				foreach (string attClassname : wpnData.m_Attachments)
+			{				
+				if (wpnData.m_Magazine != "")
 				{
-					itemObject.GetInventory().CreateAttachment(attClassname);
+					itemObject.CF_SpawnMagazine(wpnData.m_Magazine);
 				}
-				
-				itemObject.CF_SpawnMagazine(wpnData.m_Magazine);
-				
+
+				if (wpnData.m_Attachments && wpnData.m_Attachments.Count() > 0)
+				{
+					foreach (string attClassname : wpnData.m_Attachments)
+					{
+						itemObject.GetInventory().CreateAttachment(attClassname);
+					}
+				}
+								
 				ItemPreviewWidget previewWidget = ItemPreviewWidget.Cast(item.FindAnyWidget("DM_WI_Preview"));
 				previewWidget.SetItem(itemObject);
 				previewWidget.SetView(itemObject.GetViewIndex());

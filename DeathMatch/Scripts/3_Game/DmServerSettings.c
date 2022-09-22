@@ -4,6 +4,7 @@ class DM_ServerSettings
 	float m_expandStep = 10;
 	float m_healthRegen = 1.0;
 	float m_healthOutOfZoneDmg = 0.1;
+	float m_healthRegenTimeoutOnHit = 10;
 	int m_startMoney = 100;
 	int m_moneyPerKill = 10;
 	float m_expIncPerKill = 0.2;

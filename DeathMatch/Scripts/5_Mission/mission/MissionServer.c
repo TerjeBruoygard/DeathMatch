@@ -232,16 +232,14 @@ modded class MissionServer
 		{
 			return;
 		}
-
-		DM_Log("DM_WeaponBuy: " + sender.GetName() + ": " + sender.GetId() + " => " + wpnData.m_Name);
-		
-		if (player.m_dmPlayerData.IsWeaponLocked(wpnData))
-		{
-			return;
-		}
 		
 		if (!player.m_dmPlayerData.ContainsWeapon(player.m_dmConnectSyncCtx, wpnData.m_Id))
 		{
+			if (player.m_dmPlayerData.IsWeaponLocked(wpnData))
+			{
+				return;
+			}
+			
 			player.m_dmPlayerData.AddWeapon(wpnData.m_Id);
 			player.m_dmPlayerData.m_Money = player.m_dmPlayerData.m_Money - wpnData.m_Price;
 			if (player.m_dmPlayerData.m_Money < 0)
@@ -249,6 +247,8 @@ modded class MissionServer
 				player.m_dmPlayerData.m_Money = 0;
 			}
 		}
+		
+		DM_Log("DM_WeaponBuy: " + sender.GetName() + ": " + sender.GetId() + " => " + wpnData.m_Name);
 		
 		player.m_dmPlayerData.m_CurrentWeapon = wpnData.m_Id;
 		player.SynchDmPlayerDataDirty();
@@ -277,15 +277,14 @@ modded class MissionServer
 			return;
 		}
 		
-		DM_Log("DM_WeaponBuy: " + sender.GetName() + ": " + sender.GetId() + " => " + eqpData.m_Name);
-		
-		if (player.m_dmPlayerData.IsEquipmentLocked(eqpData))
-		{
-			return;
-		}
 		
 		if (!player.m_dmPlayerData.ContainsEquipment(player.m_dmConnectSyncCtx, eqpData.m_Id))
 		{
+			if (player.m_dmPlayerData.IsEquipmentLocked(eqpData))
+			{
+				return;
+			}
+			
 			player.m_dmPlayerData.AddEquipment(eqpData.m_Id);
 			player.m_dmPlayerData.m_Money = player.m_dmPlayerData.m_Money - eqpData.m_Price;
 			if (player.m_dmPlayerData.m_Money < 0)
@@ -293,6 +292,8 @@ modded class MissionServer
 				player.m_dmPlayerData.m_Money = 0;
 			}
 		}
+		
+		DM_Log("DM_EquipmentBuy: " + sender.GetName() + ": " + sender.GetId() + " => " + eqpData.m_Name);
 		
 		player.m_dmPlayerData.m_CurrentEquipment = eqpData.m_Id;
 		player.SynchDmPlayerDataDirty();
@@ -397,19 +398,25 @@ modded class MissionServer
 		}
 		
 		Weapon_Base weapon = Weapon_Base.Cast(player.GetHumanInventory().CreateInHands(wp.m_Classname));
-		foreach (string att : wp.m_Attachments)
-		{
-			EntityAI attachmentItem = player.GetInventory().CreateAttachment(att);
-			if (attachmentItem && DM_HasBatterySlot(att))
+		if (weapon)
+		{			
+			if (wp.m_Magazine != "")
 			{
-				attachmentItem.GetInventory().CreateAttachment("Battery9V");
+				weapon.CF_SpawnMagazine(wp.m_Magazine);
+				player.GetInventory().CreateInInventory(wp.m_Magazine);
 			}
-		}
-		
-		if (wp.m_Magazine != "")
-		{
-			weapon.CF_SpawnMagazine(wp.m_Magazine);
-			player.GetInventory().CreateInInventory(wp.m_Magazine);
+			
+			if (wp.m_Attachments && wp.m_Attachments.Count() > 0)
+			{
+				foreach (string att : wp.m_Attachments)
+				{
+					EntityAI attachmentItem = weapon.GetInventory().CreateAttachment(att);
+					if (attachmentItem && DM_HasBatterySlot(att))
+					{
+						attachmentItem.GetInventory().CreateAttachment("Battery9V");
+					}
+				}
+			}
 		}
 	}
 	
