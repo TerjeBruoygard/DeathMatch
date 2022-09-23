@@ -7,6 +7,8 @@ modded class MissionServer
 	float m_DmTrailShift = 0;
 	float m_DmTrailTimer = 0;
 	float m_DM_currentRadius;
+	float m_DmTimeUpdateTimer = 0;
+	int m_DmYear, m_DmMonth, m_DmDay, m_DmHour, m_DmMinute;
 	
     override void OnInit()
 	{
@@ -93,6 +95,7 @@ modded class MissionServer
 			}
 		}
 		
+		GetGame().GetWorld().GetDate(m_DmYear, m_DmMonth, m_DmDay, m_DmHour, m_DmMinute);
 		GetRPCManager().AddRPC("DM", "DM_WeaponBuy", this, SingleplayerExecutionType.Server);
 		GetRPCManager().AddRPC("DM", "DM_EquipmentBuy", this, SingleplayerExecutionType.Server);
 	};
@@ -144,6 +147,13 @@ modded class MissionServer
 			
 			m_DmTrailShift = m_DmTrailShift + (10 / dist);
 			m_DmTrailTimer = 0;
+		}
+		
+		m_DmTimeUpdateTimer = m_DmTimeUpdateTimer + timeslice;
+		if (m_DmTimeUpdateTimer > 600)
+		{
+			m_DmTimeUpdateTimer = 0;
+			GetGame().GetWorld().SetDate(m_DmYear, m_DmMonth, m_DmDay, m_DmHour, m_DmMinute);
 		}
 		
 		vector dmCurPos = DM_GetAreaPos();
