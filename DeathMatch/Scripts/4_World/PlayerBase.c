@@ -74,6 +74,11 @@ modded class PlayerBase
 			DM_RefillStats(deltaTime);
 			DM_RefillMags(deltaTime);
 			DM_Synch(deltaTime);
+			
+			if (m_dmPlayerData)
+			{
+				m_dmPlayerData.m_TimeStamp = 0;
+			}
 		}
 	}
 	
