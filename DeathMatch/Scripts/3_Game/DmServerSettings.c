@@ -10,6 +10,8 @@ class DM_ServerSettings
 	float m_expIncPerKill = 0.2;
 	float m_expDecPerDeath = 0.1;
 	float m_areaMoveSpeed = 0.2;
+	int m_databaseSaveTime = 600;
+	int m_databaseWipePlayerTimeout = 1209600; // 14 days
 	
 	void InitDefaultTrails()
 	{

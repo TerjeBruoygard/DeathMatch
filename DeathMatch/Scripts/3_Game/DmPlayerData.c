@@ -12,6 +12,7 @@ class DmPlayerData
 	string m_CurrentEquipment;
 	string m_Friends;
 	string m_Skills;
+	int m_TimeStamp;
 	
 	void Init(PlayerIdentity identity, int money)
 	{
@@ -27,6 +28,7 @@ class DmPlayerData
 		m_CurrentEquipment = "";
 		m_Friends = "";
 		m_Skills = "";
+		m_TimeStamp = 0;
 	}
 	
 	void AddWeapon(string id)
@@ -143,6 +145,7 @@ class DmPlayerData
 		ctx.Write(m_CurrentEquipment);
 		ctx.Write(m_Friends);
 		ctx.Write(m_Skills);
+		ctx.Write(m_TimeStamp);
 	}
 	
 	void Deserialize(Serializer ctx, int version)
@@ -159,5 +162,14 @@ class DmPlayerData
 		ctx.Read(m_CurrentEquipment);
 		ctx.Read(m_Friends);
 		ctx.Read(m_Skills);
+		
+		if (version >= 2)
+		{
+			ctx.Read(m_TimeStamp);
+		}
+		else
+		{
+			m_TimeStamp = 0;
+		}
 	}
 };

@@ -8,6 +8,7 @@ modded class MissionServer
 	float m_DmTrailTimer = 0;
 	float m_DM_currentRadius;
 	float m_DmTimeUpdateTimer = 0;
+	float m_DmDatabaseSaveTimer = 0;
 	int m_DmYear, m_DmMonth, m_DmDay, m_DmHour, m_DmMinute;
 	
     override void OnInit()
@@ -91,6 +92,7 @@ modded class MissionServer
 					m_DmDatabase.Set(sid, dmData);
 				}
 				
+				ctx.Close();
 				DM_Log("Finish database loading...OK " + count.ToString());
 			}
 		}
@@ -100,10 +102,26 @@ modded class MissionServer
 		GetRPCManager().AddRPC("DM", "DM_EquipmentBuy", this, SingleplayerExecutionType.Server);
 	};
 	
-	override void OnMissionFinish()
+	void CleanupDatabase_DM(int deltaTime)
 	{
-		super.OnMissionFinish();
+		TStringArray playersToDelete();
+		foreach (string sid, ref DmPlayerData dmData : m_DmDatabase)
+		{
+			dmData.m_TimeStamp = dmData.m_TimeStamp + deltaTime;
+			if (dmData.m_TimeStamp > m_DM_ServerSettings.m_databaseWipePlayerTimeout)
+			{
+				playersToDelete.Insert(sid);
+			}
+		}
 		
+		foreach (string delSid : playersToDelete)
+		{
+			m_DmDatabase.Remove(delSid);
+		}
+	}
+	
+	void SaveDatabase_DM()
+	{
 		string path = "$profile:DM\\Players.dat";
 		if (FileExist(path))
 		{
@@ -113,10 +131,10 @@ modded class MissionServer
 		
 		DM_Log("Start database saving...");
 		FileSerializer ctx = new FileSerializer();
-		ctx.Open(path, FileMode.WRITE);
+		ctx.Open(path + ".temp", FileMode.WRITE);
 		if (ctx.IsOpen())
 		{
-			int ver = 1;
+			int ver = 2;
 			int count = m_DmDatabase.Count();
 			ctx.Write(ver);
 			ctx.Write(count);			
@@ -126,8 +144,16 @@ modded class MissionServer
 				dmData.Serialize(ctx);
 			}
 			
+			ctx.Close();
+			CopyFile(path + ".temp", path);
 			DM_Log("Finish database saving...OK " + count.ToString());
 		}
+	}
+	
+	override void OnMissionFinish()
+	{
+		SaveDatabase_DM();
+		super.OnMissionFinish();
 	}
 	
 	override void OnUpdate(float timeslice)
@@ -154,6 +180,14 @@ modded class MissionServer
 		{
 			m_DmTimeUpdateTimer = 0;
 			GetGame().GetWorld().SetDate(m_DmYear, m_DmMonth, m_DmDay, m_DmHour, m_DmMinute);
+		}
+		
+		m_DmDatabaseSaveTimer = m_DmDatabaseSaveTimer + timeslice;
+		if (m_DmDatabaseSaveTimer > m_DM_ServerSettings.m_databaseSaveTime)
+		{
+			m_DmDatabaseSaveTimer = 0;
+			CleanupDatabase_DM(m_DM_ServerSettings.m_databaseSaveTime);
+			SaveDatabase_DM();
 		}
 		
 		vector dmCurPos = DM_GetAreaPos();
