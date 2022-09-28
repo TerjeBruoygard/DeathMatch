@@ -1,0 +1,104 @@
+FrameWidgetClass rootFrame {
+ position 10 10
+ size 1000 40
+ hexactpos 1
+ vexactpos 1
+ hexactsize 1
+ vexactsize 1
+ {
+  PanelWidgetClass DM_LB_Background {
+   ignorepointer 1
+   color 0.1569 0.1569 0.1569 1
+   position 0 0
+   size 1 1
+   hexactpos 1
+   vexactpos 1
+   hexactsize 0
+   vexactsize 0
+   style rover_sim_colorable
+   {
+    TextWidgetClass DM_LB_Name {
+     ignorepointer 1
+     position 10 0
+     size 430 30
+     valign center_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     text "Player Name"
+     font "gui/fonts/etelkatextpro22"
+     "exact text" 1
+     "text valign" center
+    }
+    TextWidgetClass DM_LB_Level {
+     ignorepointer 1
+     color 1 1 1 0.7059
+     position 430 0
+     size 120 30
+     halign right_ref
+     valign center_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     text "Level: 1"
+     font "gui/fonts/etelkatextpro16"
+     "exact text" 1
+     "text halign" center
+     "text valign" center
+    }
+    TextWidgetClass DM_LB_Kills {
+     ignorepointer 1
+     color 1 1 1 0.7059
+     position 280 0
+     size 150 30
+     halign right_ref
+     valign center_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     text "Kills: 999999"
+     font "gui/fonts/etelkatextpro16"
+     "exact text" 1
+     "text halign" center
+     "text valign" center
+    }
+    TextWidgetClass DM_LB_Death {
+     ignorepointer 1
+     color 1 1 1 0.7059
+     position 130 0
+     size 150 30
+     halign right_ref
+     valign center_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     text "Death: 999999"
+     font "gui/fonts/etelkatextpro16"
+     "exact text" 1
+     "text halign" center
+     "text valign" center
+    }
+    TextWidgetClass DM_LB_Kd {
+     ignorepointer 1
+     position 20 0
+     size 110 30
+     halign right_ref
+     valign center_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     text "KD: 999.99"
+     font "gui/fonts/etelkatextpro22"
+     "exact text" 1
+     "text halign" right
+     "text valign" center
+    }
+   }
+  }
+ }
+}

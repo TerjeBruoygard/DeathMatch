@@ -14,6 +14,9 @@ class DmPlayerMenu extends UIScriptedMenu
 	ref array<Widget> m_equipmentWidgets = new array<Widget>;
 	ref array<EntityAI> m_equipmentEntities = new array<EntityAI>;
 	
+	ref array<Widget> m_leaderBoardWidgets = new array<Widget>;
+	ref DmLeaderBoardData m_leaderBoardData = null;
+	
 	override Widget Init()
     {
 		layoutRoot = GetGame().GetWorkspace().CreateWidgets( "DeathMatch/Layouts/DmPlayerMenu.layout" );
@@ -24,6 +27,12 @@ class DmPlayerMenu extends UIScriptedMenu
 	
 	void SelectPage()
 	{		
+		PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
+		if (!player)
+		{
+			return;
+		}
+		
 		if (m_selectedLastPage != m_selectedPage)
 		{
 			layoutRoot.FindAnyWidget( "PageTab" + m_selectedLastPage ).SetColor( ARGB(180, 255, 255, 255) );
@@ -40,13 +49,25 @@ class DmPlayerMenu extends UIScriptedMenu
 		{
 			DisplayEquipmentsPage();
 		}
+		else if (m_selectedPage == "LeaderBoard")
+		{
+			if (m_leaderBoardData == null)
+			{
+				HideAllPages();
+				GetRPCManager().SendRPC("DM", "DM_LeaderBoardSrv", new Param1<int>(0), true, null, player); 
+			}
+			else
+			{
+				DisplayLeaderBoardPage();
+			}
+		}
 	}
 	
 	void HideAllPages()
 	{
 		layoutRoot.FindAnyWidget( "PageBodyWeapons" ).Show(false);
 		layoutRoot.FindAnyWidget( "PageBodyEquipments" ).Show(false);
-		layoutRoot.FindAnyWidget( "PageBodyFriends" ).Show(false);
+		layoutRoot.FindAnyWidget( "PageBodyLeaderBoard" ).Show(false);
 	}
 	
 	void ClearWeaponsCache()
@@ -67,6 +88,62 @@ class DmPlayerMenu extends UIScriptedMenu
 		}
 		
 		m_equipmentEntities.Clear();
+	}
+	
+	void DisplayLeaderBoardPage()
+	{
+		HideAllPages();
+		layoutRoot.FindAnyWidget( "PageBodyLeaderBoard" ).Show(true);
+		
+		float w, h, c;
+		ScrollWidget scrollWidget = ScrollWidget.Cast(layoutRoot.FindAnyWidget( "PageBodyLeaderBoardScroll" ));
+		foreach (Widget del : m_leaderBoardWidgets)
+		{
+			scrollWidget.RemoveChild(del);
+		}
+		
+		m_leaderBoardWidgets.Clear();
+		float contentWidth = scrollWidget.GetContentWidth();	
+		c = 0;
+		for (int i = 0; i < m_leaderBoardData.m_Names.Count(); i++)
+		{
+			int index = m_leaderBoardData.m_Index.Get(i);
+			if (index == -1)
+			{
+				continue;
+			}
+			
+			Widget item = GetGame().GetWorkspace().CreateWidgets( "DeathMatch/Layouts/DmPlayerMenu_ItemLeaderboard.layout" );
+			scrollWidget.AddChild(item);
+			item.GetSize(w, h);
+			item.SetPos(0, (h + 2) * c);
+			item.SetSize(contentWidth - 5, h);
+			c = c + 1;
+			
+			string name = m_leaderBoardData.m_Names.Get(i);
+			int level = m_leaderBoardData.m_Levels.Get(i);
+			int kills = m_leaderBoardData.m_Kills.Get(i);
+			int death = m_leaderBoardData.m_Death.Get(i);
+			float kd = 0;
+			
+			if (kills > 0 && death > 0)
+			{
+				kd = (float)kills / (float)death;
+			}
+			
+			string kdStr = kd.ToString();
+			int dotIndex = kdStr.IndexOf(".");
+			if (dotIndex != -1 && kdStr.Length() - dotIndex > 2)
+			{
+				kdStr = kdStr.Substring(0, dotIndex + 3);
+			}
+			
+			TextWidget.Cast(item.FindAnyWidget("DM_LB_Name")).SetText(index.ToString() + ": " + name);
+			TextWidget.Cast(item.FindAnyWidget("DM_LB_Level")).SetText("Level: " + level.ToString());
+			TextWidget.Cast(item.FindAnyWidget("DM_LB_Kills")).SetText("Kills: " + kills.ToString());
+			TextWidget.Cast(item.FindAnyWidget("DM_LB_Death")).SetText("Death: " + death.ToString());
+			TextWidget.Cast(item.FindAnyWidget("DM_LB_Kd")).SetText("KD: " + kdStr);
+		}
 	}
 	
 	void DisplayEquipmentsPage()
@@ -311,9 +388,9 @@ class DmPlayerMenu extends UIScriptedMenu
 				m_selectedPage = "Equipments";
 				m_dirty = true;
 			}
-			else if (w.GetParent().GetName() == "PageTabFriends")
+			else if (w.GetParent().GetName() == "PageTabLeaderBoard")
 			{
-				m_selectedPage = "Friends";
+				m_selectedPage = "LeaderBoard";
 				m_dirty = true;
 			}
 			
@@ -378,5 +455,6 @@ class DmPlayerMenu extends UIScriptedMenu
 		Close();
 		ClearWeaponsCache();
 		ClearEquipmentsCache();
+		m_leaderBoardData = null;
 	}
 };

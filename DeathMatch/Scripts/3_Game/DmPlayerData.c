@@ -13,10 +13,11 @@ class DmPlayerData
 	string m_Friends;
 	string m_Skills;
 	int m_TimeStamp;
+	int m_LeaderBoardIndex = -1;
 	
 	void Init(PlayerIdentity identity, int money)
 	{
-		m_Name = identity.GetFullName();
+		m_Name = identity.GetName();
 		m_Kills = 0;
 		m_Death = 0;
 		m_Money = money;

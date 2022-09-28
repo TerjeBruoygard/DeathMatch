@@ -66,8 +66,8 @@ FrameWidgetClass rootFrame {
     }
    }
   }
-  PanelWidgetClass PageTabFriends {
-   visible 0
+  PanelWidgetClass PageTabLeaderBoard {
+   visible 1
    ignorepointer 1
    color 1 1 1 0.7843
    position 147 -425
@@ -90,7 +90,7 @@ FrameWidgetClass rootFrame {
      hexactsize 0
      vexactsize 0
      style Empty
-     text "Friends"
+     text "Leaderboard"
      font "gui/fonts/etelkatextpro22"
     }
    }
@@ -109,6 +109,7 @@ FrameWidgetClass rootFrame {
    style rover_sim_blackbox
    {
     PanelWidgetClass PageBodyWeapons {
+     visible 0
      ignorepointer 1
      position 0 0
      size 1 1
@@ -185,6 +186,7 @@ FrameWidgetClass rootFrame {
      }
     }
     PanelWidgetClass PageBodyEquipments {
+     visible 0
      ignorepointer 1
      position 0 0
      size 1 1
@@ -260,7 +262,7 @@ FrameWidgetClass rootFrame {
       }
      }
     }
-    PanelWidgetClass PageBodyFriends {
+    PanelWidgetClass PageBodyLeaderBoard {
      ignorepointer 1
      position 0 0
      size 1 1
@@ -268,6 +270,20 @@ FrameWidgetClass rootFrame {
      vexactpos 1
      hexactsize 0
      vexactsize 0
+     {
+      ScrollWidgetClass PageBodyLeaderBoardScroll {
+       ignorepointer 0
+       position 0 30
+       size 1140 740
+       halign center_ref
+       valign bottom_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       "Scrollbar V" 1
+      }
+     }
     }
    }
   }

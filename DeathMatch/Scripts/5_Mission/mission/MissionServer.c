@@ -3,7 +3,9 @@ modded class MissionServer
 	ref DmConnectSyncContext m_DM_ConnectSyncCtx;
 	ref DM_ServerSettings m_DM_ServerSettings;
 	ref map<string, ref DmPlayerData> m_DmDatabase;
+	ref array<ref DmPlayerData> m_DmLeaderboard;
 	ref DM_AreaTrail m_DmCurrentTrail;
+	ref DmLeaderBoardData m_DmLeaderBoardCtx;
 	float m_DmTrailShift = 0;
 	float m_DmTrailTimer = 0;
 	float m_DM_currentRadius;
@@ -15,6 +17,10 @@ modded class MissionServer
 	{
 		super.OnInit();
 		
+		m_DmLeaderBoardCtx = new DmLeaderBoardData;
+		m_DmLeaderBoardCtx.Init();
+		
+		m_DmLeaderboard = new array<ref DmPlayerData>;
 		m_DmDatabase = new map<string, ref DmPlayerData>;
 		m_DM_ServerSettings = new DM_ServerSettings;
 		m_DM_ConnectSyncCtx = new DmConnectSyncContext;
@@ -97,10 +103,53 @@ modded class MissionServer
 			}
 		}
 		
+		BuildLeaderboard_DM();
 		GetGame().GetWorld().GetDate(m_DmYear, m_DmMonth, m_DmDay, m_DmHour, m_DmMinute);
 		GetRPCManager().AddRPC("DM", "DM_WeaponBuy", this, SingleplayerExecutionType.Server);
 		GetRPCManager().AddRPC("DM", "DM_EquipmentBuy", this, SingleplayerExecutionType.Server);
+		GetRPCManager().AddRPC("DM", "DM_LeaderBoardSrv", this, SingleplayerExecutionType.Server);
 	};
+	
+	void BuildLeaderboard_DM()
+	{
+		array<float> kdSortedArray();
+		multiMap<float, string> kdMultiMap(); 
+		foreach (string sid, ref DmPlayerData dmData : m_DmDatabase)
+		{
+			if (dmData.m_Death == 0 || dmData.m_Kills == 0 || dmData.m_Name.Length() == 0)
+			{
+				continue;
+			}
+			
+			float dkValue = (float)dmData.m_Kills / (float)dmData.m_Death;
+			kdMultiMap.Insert(dkValue, sid);
+			kdSortedArray.Insert(dkValue);
+		}
+		
+		float lastValue = -1;
+		int leaderBoardIndex = 1;
+		kdSortedArray.Sort(true);
+		m_DmLeaderboard.Clear();
+		for (int i = 0; i < kdSortedArray.Count(); i++)
+		{
+			float dkVal2 = kdSortedArray.Get(i);
+			if (lastValue == dkVal2)
+			{
+				continue;
+			}
+			
+			lastValue = dkVal2;
+			TStringArray sidsArray = kdMultiMap.Get(dkVal2);
+			foreach (string sid2 : sidsArray)
+			{
+				ref DmPlayerData sortedDmData = m_DmDatabase.Get(sid2);
+				sortedDmData.m_LeaderBoardIndex = leaderBoardIndex;
+				m_DmLeaderboard.Insert(sortedDmData);
+				
+				leaderBoardIndex = leaderBoardIndex + 1;
+			}
+		}
+	}
 	
 	void CleanupDatabase_DM(int deltaTime)
 	{
@@ -146,6 +195,7 @@ modded class MissionServer
 			
 			ctx.Close();
 			CopyFile(path + ".temp", path);
+			DeleteFile(path + ".temp");
 			DM_Log("Finish database saving...OK " + count.ToString());
 		}
 	}
@@ -187,6 +237,7 @@ modded class MissionServer
 		{
 			m_DmDatabaseSaveTimer = 0;
 			CleanupDatabase_DM(m_DM_ServerSettings.m_databaseSaveTime);
+			BuildLeaderboard_DM();
 			SaveDatabase_DM();
 		}
 		
@@ -254,6 +305,54 @@ modded class MissionServer
 		vector result = vector.Lerp(startPos, endPos, delta);
 		result[1] = GetGame().SurfaceY(result[0], result[2]);
 		return result;
+	}
+	
+	void DM_LeaderBoardSrv(CallType type, ParamsReadContext ctx, PlayerIdentity sender, Object target)
+	{
+		if (type != CallType.Server)
+		{
+			return;
+		}
+		
+		PlayerBase player = PlayerBase.Cast(target);
+		if (!player || !player.IsAlive() || !player.m_dmPlayerData)
+		{
+			return;
+		}
+		
+		int count = m_DmLeaderboard.Count();
+		if (count > m_DM_ServerSettings.m_leaderBoardTopSize)
+		{
+			count = m_DM_ServerSettings.m_leaderBoardTopSize;
+		}
+		
+		bool alreadyInTop = false;
+		m_DmLeaderBoardCtx.Clear();
+		for (int i = 0; i < count; i++)
+		{
+			ref DmPlayerData dmData = m_DmLeaderboard.Get(i);
+			m_DmLeaderBoardCtx.m_Names.Insert(dmData.m_Name);
+			m_DmLeaderBoardCtx.m_Levels.Insert(dmData.m_Level);
+			m_DmLeaderBoardCtx.m_Kills.Insert(dmData.m_Kills);
+			m_DmLeaderBoardCtx.m_Death.Insert(dmData.m_Death);
+			m_DmLeaderBoardCtx.m_Index.Insert(dmData.m_LeaderBoardIndex);
+			
+			if (dmData == player.m_dmPlayerData)
+			{
+				alreadyInTop = true;
+			}
+		}
+		
+		if (!alreadyInTop)
+		{
+			m_DmLeaderBoardCtx.m_Names.Insert(player.m_dmPlayerData.m_Name);
+			m_DmLeaderBoardCtx.m_Levels.Insert(player.m_dmPlayerData.m_Level);
+			m_DmLeaderBoardCtx.m_Kills.Insert(player.m_dmPlayerData.m_Kills);
+			m_DmLeaderBoardCtx.m_Death.Insert(player.m_dmPlayerData.m_Death);
+			m_DmLeaderBoardCtx.m_Index.Insert(player.m_dmPlayerData.m_LeaderBoardIndex);
+		}
+		
+		GetRPCManager().SendRPC("DM", "DM_LeaderBoard", new Param1<ref DmLeaderBoardData>(m_DmLeaderBoardCtx), true, sender); 
 	}
 	
 	void DM_WeaponBuy(CallType type, ParamsReadContext ctx, PlayerIdentity sender, Object target)
@@ -364,6 +463,7 @@ modded class MissionServer
 		}
 		else
 		{
+			dmData.m_Name = identity.GetName();
 			DM_Log("Load exist player: " + sid);
 		}
 		

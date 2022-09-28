@@ -18,6 +18,7 @@ modded class MissionGameplay
 		}
 		
 		GetRPCManager().AddRPC("DM", "DM_KillFeed", this, SingleplayerExecutionType.Client);
+		GetRPCManager().AddRPC("DM", "DM_LeaderBoard", this, SingleplayerExecutionType.Client);
 	}
 	
 	override void OnMissionStart()
@@ -191,6 +192,26 @@ modded class MissionGameplay
 		{
 			widget.GetPos(x, y);
 			widget.SetPos(x, y - (h + 4));
+		}
+	}
+	
+	void DM_LeaderBoard(CallType type, ParamsReadContext ctx, PlayerIdentity sender, Object target)
+	{
+		if (type != CallType.Client)
+		{
+			return;
+		}
+		
+		Param1<ref DmLeaderBoardData> data;
+		if (!ctx.Read(data))
+		{
+			return;
+		}
+		
+		if (m_dmPlayerMenu && m_dmPlayerMenu.m_active)
+		{
+			m_dmPlayerMenu.m_leaderBoardData = data.param1;
+			m_dmPlayerMenu.m_dirty = true;
 		}
 	}
 	
