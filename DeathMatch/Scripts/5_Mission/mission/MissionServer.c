@@ -225,11 +225,14 @@ modded class MissionServer
 			m_DmTrailTimer = 0;
 		}
 		
-		m_DmTimeUpdateTimer = m_DmTimeUpdateTimer + timeslice;
-		if (m_DmTimeUpdateTimer > 600)
+		if (m_DM_ServerSettings.m_lockWorldTime > 0)
 		{
-			m_DmTimeUpdateTimer = 0;
-			GetGame().GetWorld().SetDate(m_DmYear, m_DmMonth, m_DmDay, m_DmHour, m_DmMinute);
+			m_DmTimeUpdateTimer = m_DmTimeUpdateTimer + timeslice;
+			if (m_DmTimeUpdateTimer > 600)
+			{
+				m_DmTimeUpdateTimer = 0;
+				GetGame().GetWorld().SetDate(m_DmYear, m_DmMonth, m_DmDay, m_DmHour, m_DmMinute);
+			}
 		}
 		
 		m_DmDatabaseSaveTimer = m_DmDatabaseSaveTimer + timeslice;
