@@ -399,7 +399,7 @@ modded class MissionServer
 		
 		player.m_dmPlayerData.m_CurrentWeapon = wpnData.m_Id;
 		player.SynchDmPlayerDataDirty();
-		EquipPlayerWeapon_DM(player, wpnData);
+		EquipPlayer_DM(player);
 	}
 	
 	void DM_EquipmentBuy(CallType type, ParamsReadContext ctx, PlayerIdentity sender, Object target)
@@ -444,13 +444,7 @@ modded class MissionServer
 		
 		player.m_dmPlayerData.m_CurrentEquipment = eqpData.m_Id;
 		player.SynchDmPlayerDataDirty();
-		EquipPlayerClothing_DM(player, eqpData);
-		
-		ref DmWeaponPresset wpnData = m_DM_ConnectSyncCtx.FindWeaponPresset(player.m_dmPlayerData.m_CurrentWeapon);
-		if (wpnData)
-		{
-			EquipPlayerWeapon_DM(player, wpnData);
-		}
+		EquipPlayer_DM(player);
 	}
 	
 	override PlayerBase CreateCharacter(PlayerIdentity identity, vector pos, ParamsReadContext ctx, string characterName)
@@ -490,18 +484,7 @@ modded class MissionServer
 		m_player.m_dmPlayerData = dmData;
 		m_player.m_dmConnectSyncCtx = m_DM_ConnectSyncCtx;
 		m_player.SynchDmPlayerDataDirty();
-		
-		ref DmEquipmentPresset eqpData = m_DM_ConnectSyncCtx.FindEquipmentPresset(dmData.m_CurrentEquipment);
-		if (eqpData)
-		{
-			EquipPlayerClothing_DM(m_player, eqpData);
-		}
-		
-		ref DmWeaponPresset wpnData = m_DM_ConnectSyncCtx.FindWeaponPresset(dmData.m_CurrentWeapon);
-		if (wpnData)
-		{
-			EquipPlayerWeapon_DM(m_player, wpnData);
-		}
+		EquipPlayer_DM(m_player);
 		
 		return m_player;
 	};
@@ -511,9 +494,25 @@ modded class MissionServer
 
 	};
 	
-	void EquipPlayerClothing_DM(PlayerBase player, ref DmEquipmentPresset ep)
+	void EquipPlayer_DM(PlayerBase player)
 	{
 		player.ClearInventory();
+		
+		ref DmEquipmentPresset eqpData = m_DM_ConnectSyncCtx.FindEquipmentPresset(player.m_dmPlayerData.m_CurrentEquipment);
+		if (eqpData)
+		{
+			EquipPlayerClothing_DM(player, eqpData);
+		}
+		
+		ref DmWeaponPresset wpnData = m_DM_ConnectSyncCtx.FindWeaponPresset(player.m_dmPlayerData.m_CurrentWeapon);
+		if (wpnData)
+		{
+			EquipPlayerWeapon_DM(m_player, wpnData);
+		}
+	}
+	
+	void EquipPlayerClothing_DM(PlayerBase player, ref DmEquipmentPresset ep)
+	{
 		foreach (string itClass : ep.m_Items)
 		{
 			EntityAI itemObj = player.GetInventory().CreateInInventory(itClass);
@@ -526,25 +525,6 @@ modded class MissionServer
 	
 	void EquipPlayerWeapon_DM(PlayerBase player, ref DmWeaponPresset wp)
 	{
-		array<EntityAI> items();
-		player.GetInventory().EnumerateInventory(InventoryTraversalType.PREORDER, items);
-		foreach (auto item : items)
-		{
-			Weapon_Base wpn = Weapon_Base.Cast(item);
-			if (wpn)
-			{
-				GetGame().ObjectDelete(wpn);
-				continue;
-			}
-			
-			Magazine mag = Magazine.Cast(item);
-			if (mag && !mag.GetInventory().IsAttachment())
-			{
-				GetGame().ObjectDelete(mag);
-				continue;
-			}
-		}
-		
 		Weapon_Base weapon = Weapon_Base.Cast(player.GetHumanInventory().CreateInHands(wp.m_Classname));
 		if (weapon)
 		{			

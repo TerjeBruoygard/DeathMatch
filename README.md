@@ -59,6 +59,8 @@ class Missions
 - m_databaseWipePlayerTimeout: time in seconds since the player last activity on the server, after which the player will be deleted from the database.
 - m_leaderBoardTopSize: maximum size of leader board. Be careful, big number of records can drop server performance.
 - m_lockWorldTime: if set to 1, the time on the server will be frozen and will not move.
+- m_deadBodyDespawnTime: auto-delete dead player bodies after this time in seconds.
+- m_clearDroppedItemsOnGround: delete dropped items (clothing, weapons, etc...) near the player on ground.
 [/code]
 
 [b]Weapons.json[/b] - weapons to sell

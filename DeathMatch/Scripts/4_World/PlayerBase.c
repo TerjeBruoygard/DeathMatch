@@ -23,6 +23,7 @@ modded class PlayerBase
 	float m_DmPlayerDataSynchTimer = 1000;
 	float m_RefillMagsTimer = 0;
 	float m_DmHealthRegenTimeout = 0;
+	float m_DmClearItemsTimer = 0;
 	EntityAI m_lastDamageSource = NULL;
 	ref DM_ServerSettings m_dmServerSettings = null;
 	
@@ -74,6 +75,7 @@ modded class PlayerBase
 			DM_RefillStats(deltaTime);
 			DM_RefillMags(deltaTime);
 			DM_Synch(deltaTime);
+			DM_ClearItems(deltaTime);
 			
 			if (m_dmPlayerData)
 			{
@@ -88,6 +90,11 @@ modded class PlayerBase
 	}
 	
 	override bool PhysicalPredictiveDropItem(EntityAI entity, bool heavy_item_only = true)
+	{
+		return false;
+	}
+	
+	override bool PredictiveDropEntity (notnull EntityAI item)
 	{
 		return false;
 	}
@@ -170,7 +177,9 @@ modded class PlayerBase
 		
 		
 		super.EEKilled( killer );
-		GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater(GetGame().ObjectDelete, 1000, false, this);
+		
+		int despawnBodyTime = (int)(m_dmServerSettings.m_deadBodyDespawnTime * 1000);
+		GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater(GetGame().ObjectDelete, despawnBodyTime, false, this);
 	}
 	
 	override void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos, float speedCoef)
@@ -191,6 +200,11 @@ modded class PlayerBase
 		
 		m_DmHealthRegenTimeout = m_dmServerSettings.m_healthRegenTimeoutOnHit;
 		super.EEHitBy(damageResult, damageType, source, component, dmgZone, ammo, modelPos, speedCoef);
+	}
+	
+	override bool IsInventoryVisible()
+	{
+		return false;
 	}
 	
 	void DM_RefillStats(float deltaTime)
@@ -327,6 +341,30 @@ modded class PlayerBase
 			m_DmPlayerDataSynchDirty = false;
 			ref Param1<ref DmPlayerData> dmPlayerDataContext = new Param1<ref DmPlayerData>(m_dmPlayerData);
 			RPCSingleParam(14880022, dmPlayerDataContext, true, GetIdentity());
+		}
+	}
+	
+	void DM_ClearItems(float deltaTime)
+	{
+		if (m_dmServerSettings.m_clearDroppedItemsOnGround == 0)
+		{
+			return;
+		}
+		
+		m_DmClearItemsTimer = m_DmClearItemsTimer + deltaTime;
+		if (m_DmClearItemsTimer > 1.0)
+		{
+			m_DmClearItemsTimer = 0;
+			ItemBase nearestItem = NULL;
+			array<Object> nearestObjects();
+			GetGame().GetObjectsAtPosition3D(GetWorldPosition(), 10, nearestObjects, NULL);
+			foreach (Object nearestObj : nearestObjects)
+			{
+				if (ItemBase.CastTo(nearestItem, nearestObj))
+				{
+					GetGame().ObjectDelete(nearestItem);
+				}
+			}
 		}
 	}
 };
