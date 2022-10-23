@@ -1,27 +1,24 @@
-[h1]Death Match Classic[/h1]
-[b]Repacking or republishing of this mod is prohibited![/b]
+# Death Match Classic
+### Repacking or republishing of this mod is prohibited!
 
-[h2]Key features[/h2]
-[list]
-[*]Disabled all diseases and stats except health.
-[*]Fast respawn after death.
-[*]When killing players, you earn a level and money.
-[*]Virtual store with weapons and clothing.
-[*]No zombies and no loot on the map. Good optimized and very high server FPS.
-[*]The PVP area is limited by gas. Players outside of it will take damage.
-[*]The PVP area expands depending on the number of players on the server.
-[*]The PVP area moves around the map.
-[*]Kill feed and leader board.
-[*]Magazines and ammo auto-refill in inventory.
-[*]Clothing and weapons auto-repair in inventory.
-[/list]
+## Key features
+* Disabled all diseases and stats except health.
+* Fast respawn after death.
+* When killing players, you earn a level and money.
+* Virtual store with weapons and clothing.
+* No zombies and no loot on the map. Good optimized and very high server FPS.
+* The PVP area is limited by gas. Players outside of it will take damage.
+* The PVP area expands depending on the number of players on the server.
+* The PVP area moves around the map.
+* Kill feed and leader board.
+* Magazines and ammo auto-refill in inventory.
+* Clothing and weapons auto-repair in inventory.
 
-[h2]For server owners[/h2]
-[list]
-[*]Install the mod. 
-[*]Copy the mission folder from the "mpmissions" folder in the mod to the server's "mpmissions" folder.
-[*]In the server config "serverDZ.cfg" change/add:
-[code]
+## For server owners
+* Install the mod. 
+* Copy the mission folder from the "mpmissions" folder in the mod to the server's "mpmissions" folder.
+* In the server config "serverDZ.cfg" change/add:
+```
 serverTime="2022/9/17/12/0";
 serverTimeAcceleration=0;
 serverNightTimeAcceleration=0;
@@ -35,12 +32,11 @@ class Missions
         template="deathMatch.chernarusplus";
     };
 };
-[/code]
-[*]Run server to create default config files in "profiles/DM" folder.
-[/list]
+```
+* Run server to create default config files in "profiles/DM" folder.
 
-[b]Settings.json[/b] - general settings
-[code]
+**Settings.json** - general settings
+```
 - m_trails: list of locations (paths) along which the PVP area will move.Random path will be selected on server starting.
     - m_points: a list of points along which the PVP area will move. After reaching the last point in the list, the PVP area will start moving towards the first point. Random point will be selected on server starting.
     - m_minRadius: minimum (starting) radius of the PVP area.
@@ -61,10 +57,10 @@ class Missions
 - m_lockWorldTime: if set to 1, the time on the server will be frozen and will not move.
 - m_deadBodyDespawnTime: auto-delete dead player bodies after this time in seconds.
 - m_clearDroppedItemsOnGround: delete dropped items (clothing, weapons, etc...) near the player on ground.
-[/code]
+```
 
-[b]Weapons.json[/b] - weapons to sell
-[code]
+**Weapons.json** - weapons to sell
+```
 - m_Id - short and unique name of weapon preset (used in database, should be unique and short)
 - m_Name - name of the presset. Will be displayed in game.
 - m_Classname - classname of the weapon.
@@ -72,27 +68,27 @@ class Missions
 - m_Magazine - magazine or ammo to be loaded in weapon when player spawned with this presset.
 - m_Level - level to unlock this weapon presset (shold be greater then 0)
 - m_Price - price of the weapon presset. Used for first time purchase. Use 0 for free weapon pressets.
-[/code]
+```
 
-[b]Equipment.json[/b] - equipment to sell
-[code]
+**Equipment.json** - equipment to sell
+```
 - m_Id - short and unique name of equipment preset (used in database, should be unique and short)
 - m_Name - name of the presset. Will be displayed in game.
 - m_Items - list of items that will be spawned on the player.
 - m_Level - level to unlock this weapon presset (shold be greater then 0)
 - m_Price - price of the weapon presset. Used for first time purchase. Use 0 for free weapon pressets.
-[/code]
+```
 
-[hr][/hr]
+_________________
 
-[h2]Support and terms[/h2]
-[b]If you wana help me with mod development - you can submit pull requests with new features and bug fixes on github[/b]
-[url=https://github.com/TerjeBruoygard/DeathMatch] https://github.com/TerjeBruoygard/DeathMatch [/url]
+## Support and terms
+**If you wana help me with mod development - you can submit pull requests with new features and bug fixes on github**
+[https://github.com/TerjeBruoygard/DeathMatch](https://github.com/TerjeBruoygard/DeathMatch)
 
-[b]If you want to support me:[/b]
+**If you want to support me:**
 BTC: bc1q395yw8as5v9mn4yzls5y78av0q342e2cwdrhdh 
 PayPal: ivankishchenko@protonmail.com
 
-[h3]Repacking or republishing of this mod is prohibited![/h3]
+### Repacking or republishing of this mod is prohibited!
 
-[h3]Author: Terje Bruoygard[/h3]
+### Author: Terje Bruoygard
