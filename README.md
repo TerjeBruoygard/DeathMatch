@@ -86,8 +86,10 @@ _________________
 [https://github.com/TerjeBruoygard/DeathMatch](https://github.com/TerjeBruoygard/DeathMatch)
 
 **If you want to support me:**
-BTC: bc1q395yw8as5v9mn4yzls5y78av0q342e2cwdrhdh 
+```
+BTC: bc1q395yw8as5v9mn4yzls5y78av0q342e2cwdrhdh
 PayPal: ivankishchenko@protonmail.com
+```
 
 ### Repacking or republishing of this mod is prohibited!
 
