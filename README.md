@@ -1,5 +1,5 @@
 [h1]Death Match Classic[/h1]
-[b]Repacking, modifying or republishing of this mod is prohibited![/b]
+[b]Repacking or republishing of this mod is prohibited![/b]
 
 [h2]Key features[/h2]
 [list]
@@ -84,6 +84,15 @@ class Missions
 [/code]
 
 [hr][/hr]
-[h3]Repacking, modifying or republishing of this mod is prohibited![/h3]
+
+[h2]Support and terms[/h2]
+[b]If you wana help me with mod development - you can submit pull requests with new features and bug fixes on github[/b]
+[url=https://github.com/TerjeBruoygard/DeathMatch] https://github.com/TerjeBruoygard/DeathMatch [/url]
+
+[b]If you want to support me:[/b]
+BTC: bc1q395yw8as5v9mn4yzls5y78av0q342e2cwdrhdh 
+PayPal: ivankishchenko@protonmail.com
+
+[h3]Repacking or republishing of this mod is prohibited![/h3]
 
 [h3]Author: Terje Bruoygard[/h3]
