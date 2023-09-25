@@ -87,8 +87,7 @@ _________________
 
 **If you want to support me:**
 ```
-BTC: bc1q395yw8as5v9mn4yzls5y78av0q342e2cwdrhdh
-PayPal: ivankishchenko@protonmail.com
+PayPal: https://paypal.me/terjebruoygard
 ```
 
 ### Repacking or republishing of this mod is prohibited!
