@@ -86,9 +86,7 @@ _________________
 [https://github.com/TerjeBruoygard/DeathMatch](https://github.com/TerjeBruoygard/DeathMatch)
 
 **If you want to support me:**
-```
-PayPal: https://paypal.me/terjebruoygard
-```
+[https://paypal.me/terjebruoygard](https://paypal.me/terjebruoygard)
 
 ### Repacking or republishing of this mod is prohibited!
 
