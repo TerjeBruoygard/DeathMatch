@@ -1,5 +1,4 @@
 # Death Match Classic
-### Repacking or republishing of this mod is prohibited!
 
 ## Key features
 * Disabled all diseases and stats except health.
@@ -16,23 +15,7 @@
 
 ## For server owners
 * Install the mod. 
-* Copy the mission folder from the "mpmissions" folder in the mod to the server's "mpmissions" folder.
-* In the server config "serverDZ.cfg" change/add:
-```
-serverTime="2022/9/17/12/0";
-serverTimeAcceleration=0;
-serverNightTimeAcceleration=0;
-serverTimePersistent=0;
-enableCfgGameplayFile = 1;
-
-class Missions
-{
-    class DayZ
-    {
-        template="deathMatch.chernarusplus";
-    };
-};
-```
+* Copy and replace files from "MISSION" folder to the server's "mpmissions/YOUR_MISSION_FOLDER" folder.
 * Run server to create default config files in "profiles/DM" folder.
 
 **Settings.json** - general settings
@@ -55,7 +38,7 @@ class Missions
 - m_databaseWipePlayerTimeout: time in seconds since the player last activity on the server, after which the player will be deleted from the database.
 - m_leaderBoardTopSize: maximum size of leader board. Be careful, big number of records can drop server performance.
 - m_lockWorldTime: if set to 1, the time on the server will be frozen and will not move.
-- m_deadBodyDespawnTime: auto-delete dead player bodies after this time in seconds.
+- m_fastRespawnTimeout: fast auto-respawn for dead players (time in seconds)
 - m_clearDroppedItemsOnGround: delete dropped items (clothing, weapons, etc...) near the player on ground.
 ```
 
@@ -88,6 +71,5 @@ _________________
 **If you want to support me:**
 [https://paypal.me/terjebruoygard](https://paypal.me/terjebruoygard)
 
-### Repacking or republishing of this mod is prohibited!
-
+### Repack is allowed
 ### Author: Terje Bruoygard

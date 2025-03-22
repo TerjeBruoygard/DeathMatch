@@ -44,7 +44,7 @@ class DmPlayerData
 		}
 	}
 	
-	bool ContainsWeapon(ref DmConnectSyncContext dmConnectSyncCtx, string id)
+	bool ContainsWeapon(DmConnectSyncContext dmConnectSyncCtx, string id)
 	{
 		TStringArray resultList = new TStringArray;
 		m_Weapons.Split(";", resultList);
@@ -71,12 +71,12 @@ class DmPlayerData
 		return false;
 	}
 	
-	bool IsWeaponLocked(ref DmWeaponPresset presset)
+	bool IsWeaponLocked(DmWeaponPresset presset)
 	{
 		return presset.m_Level > m_Level || presset.m_Price > m_Money;
 	}
 	
-	bool IsWeaponSelected(ref DmWeaponPresset presset)
+	bool IsWeaponSelected(DmWeaponPresset presset)
 	{
 		return presset.m_Id == m_CurrentWeapon;
 	}
@@ -94,7 +94,7 @@ class DmPlayerData
 		}
 	}
 	
-	bool ContainsEquipment(ref DmConnectSyncContext dmConnectSyncCtx, string id)
+	bool ContainsEquipment(DmConnectSyncContext dmConnectSyncCtx, string id)
 	{
 		TStringArray resultList = new TStringArray;
 		m_Equipment.Split(";", resultList);
@@ -121,12 +121,12 @@ class DmPlayerData
 		return false;
 	}
 	
-	bool IsEquipmentLocked(ref DmEquipmentPresset presset)
+	bool IsEquipmentLocked(DmEquipmentPresset presset)
 	{
 		return presset.m_Level > m_Level || presset.m_Price > m_Money;
 	}
 	
-	bool IsEquipmentSelected(ref DmEquipmentPresset presset)
+	bool IsEquipmentSelected(DmEquipmentPresset presset)
 	{
 		return presset.m_Id == m_CurrentEquipment;
 	}

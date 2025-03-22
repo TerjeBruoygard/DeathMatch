@@ -21,7 +21,7 @@ class DmEquipmentPresset
 		return this;
 	}
 	
-	static void CreateDefaultPressets(ref array<ref DmEquipmentPresset> result)
+	static void CreateDefaultPressets(array<ref DmEquipmentPresset> result)
 	{
 		result.Insert((new DmEquipmentPresset()).Init("prison", "Prisoner", 1, 0).Atth("PrisonerCap").Atth("PrisonUniformJacket").Atth("PrisonUniformPants").Atth("AthleticShoes_Black"));
 		result.Insert((new DmEquipmentPresset()).Init("farmer", "Farmer", 2, 50).Atth("LeatherHat_Brown").Atth("LeatherJacket_Brown").Atth("CanvasPants_Beige").Atth("Wellies_Black"));

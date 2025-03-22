@@ -25,7 +25,7 @@ class DmWeaponPresset
 		return this;
 	}
 	
-	static void CreateDefaultPressets(ref array<ref DmWeaponPresset> result)
+	static void CreateDefaultPressets(array<ref DmWeaponPresset> result)
 	{
 		result.Insert((new DmWeaponPresset()).Init("makarov", "IJ70 'Makarov'", "MakarovIJ70", "Mag_IJ70_8Rnd", 1, 0));
 		result.Insert((new DmWeaponPresset()).Init("izh18", "Izh18 'Singleshot'", "Izh18", "Ammo_762x39Tracer", 1, 0));

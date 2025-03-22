@@ -178,8 +178,17 @@ modded class PlayerBase
 		
 		super.EEKilled( killer );
 		
-		int despawnBodyTime = (int)(m_dmServerSettings.m_deadBodyDespawnTime * 1000);
-		GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater(GetGame().ObjectDelete, despawnBodyTime, false, this);
+		int fastRespawnTimeoutTime = (int)(m_dmServerSettings.m_fastRespawnTimeout * 1000);
+		if (fastRespawnTimeoutTime > 0)
+		{
+			ref Param2<PlayerBase, PlayerIdentity> fastRespawnParams = new Param2<PlayerBase, PlayerIdentity>(this, GetIdentity());
+			GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLaterByName(GetGame().GetMission(), "DM_PlayerFastRespawnHandler", fastRespawnTimeoutTime, false, fastRespawnParams);
+		}
+		else
+		{
+			ref Param1<PlayerBase> deletePlayerParams = new Param2<PlayerBase>(this);
+			GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLaterByName(GetGame(), "ObjectDelete", 1000, false, deletePlayerParams);
+		}
 	}
 	
 	override void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos, float speedCoef)

@@ -447,7 +447,25 @@ modded class MissionServer
 		EquipPlayer_DM(player);
 	}
 	
-	override PlayerBase CreateCharacter(PlayerIdentity identity, vector pos, ParamsReadContext ctx, string characterName)
+	void DM_PlayerFastRespawnHandler(PlayerBase deadBody, PlayerIdentity identity)
+	{
+		if (deadBody)
+		{
+			if (identity)
+			{
+				vector pos = CalculateSafePos_DM(DM_GetAreaPos(), Math.Clamp(m_DM_currentRadius - 20, 10, 10000));
+				PlayerBase player = CreateCharacter(identity, pos, null, GetGame().CreateRandomPlayer());
+				if (player)
+				{
+					DM_PlayerCustomRespawnHandler(player, identity, false);
+				}
+			}
+			
+			GetGame().ObjectDelete(deadBody);
+		}
+	}
+	
+	void DM_PlayerCustomRespawnHandler(PlayerBase player, PlayerIdentity identity, bool calculateSafePos)
 	{
 		string sid = identity.GetId();
 		ref DmPlayerData dmData = null;
@@ -474,40 +492,67 @@ modded class MissionServer
 			dmData.m_CurrentEquipment = m_DM_ConnectSyncCtx.dm_Equipments.Get(0).m_Id;
 		}
 		
-		pos = CalculateSafePos_DM(DM_GetAreaPos(), Math.Clamp(m_DM_currentRadius - 20, 10, 10000));
-		Entity playerEnt;
-		playerEnt = GetGame().CreatePlayer(identity, characterName, pos, 0, "NONE");
-		Class.CastTo(m_player, playerEnt);
-		GetGame().SelectPlayer(identity, m_player);
+		if (calculateSafePos)
+		{
+			player.SetPosition(CalculateSafePos_DM(DM_GetAreaPos(), Math.Clamp(m_DM_currentRadius - 20, 10, 10000)));
+		}
 		
-		m_player.m_dmServerSettings = m_DM_ServerSettings;
-		m_player.m_dmPlayerData = dmData;
-		m_player.m_dmConnectSyncCtx = m_DM_ConnectSyncCtx;
-		m_player.SynchDmPlayerDataDirty();
-		EquipPlayer_DM(m_player);
-		
-		return m_player;
-	};
+		player.m_dmServerSettings = m_DM_ServerSettings;
+		player.m_dmPlayerData = dmData;
+		player.m_dmConnectSyncCtx = m_DM_ConnectSyncCtx;
+		player.SynchDmPlayerDataDirty();
+		EquipPlayer_DM(player);
+	}
 	
-	override void EquipCharacter(MenuDefaultCharacterData char_data)
+	override PlayerBase CreateCharacter(PlayerIdentity identity, vector pos, ParamsReadContext ctx, string characterName)
 	{
-
-	};
+		vector pos = CalculateSafePos_DM(DM_GetAreaPos(), Math.Clamp(m_DM_currentRadius - 20, 10, 10000));
+		return super.CreateCharacter(identity, pos, ctx, characterName);
+	}
+	
+	override void InvokeOnConnect(PlayerBase player, PlayerIdentity identity)
+	{
+		super.InvokeOnConnect(player, identity);
+		DM_PlayerCustomRespawnHandler(player, identity, true);
+	}
 	
 	void EquipPlayer_DM(PlayerBase player)
 	{
-		player.ClearInventory();
-		
-		ref DmEquipmentPresset eqpData = m_DM_ConnectSyncCtx.FindEquipmentPresset(player.m_dmPlayerData.m_CurrentEquipment);
-		if (eqpData)
+		GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).Call(EquipPlayer_DM_Subfnc0, player);
+	}
+	
+	void EquipPlayer_DM_Subfnc0(PlayerBase player)
+	{
+		if (player)
 		{
-			EquipPlayerClothing_DM(player, eqpData);
+			player.ClearInventory();
+			GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).Call(EquipPlayer_DM_Subfnc1, player);
 		}
-		
-		ref DmWeaponPresset wpnData = m_DM_ConnectSyncCtx.FindWeaponPresset(player.m_dmPlayerData.m_CurrentWeapon);
-		if (wpnData)
+	}
+	
+	void EquipPlayer_DM_Subfnc1(PlayerBase player)
+	{
+		if (player)
 		{
-			EquipPlayerWeapon_DM(m_player, wpnData);
+			ref DmEquipmentPresset eqpData = m_DM_ConnectSyncCtx.FindEquipmentPresset(player.m_dmPlayerData.m_CurrentEquipment);
+			if (eqpData)
+			{
+				EquipPlayerClothing_DM(player, eqpData);
+			}
+			
+			GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).Call(EquipPlayer_DM_Subfnc2, player);
+		}
+	}
+	
+	void EquipPlayer_DM_Subfnc2(PlayerBase player)
+	{
+		if (player)
+		{
+			ref DmWeaponPresset wpnData = m_DM_ConnectSyncCtx.FindWeaponPresset(player.m_dmPlayerData.m_CurrentWeapon);
+			if (wpnData)
+			{
+				EquipPlayerWeapon_DM(player, wpnData);
+			}
 		}
 	}
 	
