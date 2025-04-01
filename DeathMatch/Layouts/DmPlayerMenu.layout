@@ -66,35 +66,6 @@ FrameWidgetClass rootFrame {
     }
    }
   }
-  PanelWidgetClass PageTabLeaderBoard {
-   visible 1
-   ignorepointer 1
-   color 1 1 1 0.7843
-   position 147 -425
-   size 294 50
-   halign center_ref
-   valign center_ref
-   hexactpos 1
-   vexactpos 1
-   hexactsize 1
-   vexactsize 1
-   style rover_sim_blackbox
-   {
-    ButtonWidgetClass TextWidget2 {
-     ignorepointer 0
-     size 1 0.8
-     halign center_ref
-     valign center_ref
-     hexactpos 1
-     vexactpos 1
-     hexactsize 0
-     vexactsize 0
-     style Empty
-     text "Leaderboard"
-     font "gui/fonts/etelkatextpro22"
-    }
-   }
-  }
   PanelWidgetClass PageBodyBack {
    visible 1
    ignorepointer 1
@@ -259,29 +230,6 @@ FrameWidgetClass rootFrame {
          "text valign" center
         }
        }
-      }
-     }
-    }
-    PanelWidgetClass PageBodyLeaderBoard {
-     ignorepointer 1
-     position 0 0
-     size 1 1
-     hexactpos 1
-     vexactpos 1
-     hexactsize 0
-     vexactsize 0
-     {
-      ScrollWidgetClass PageBodyLeaderBoardScroll {
-       ignorepointer 0
-       position 0 30
-       size 1140 740
-       halign center_ref
-       valign bottom_ref
-       hexactpos 1
-       vexactpos 1
-       hexactsize 1
-       vexactsize 1
-       "Scrollbar V" 1
       }
      }
     }
