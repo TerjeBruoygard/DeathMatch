@@ -260,15 +260,15 @@ modded class PlayerBase
 			SetBrokenLegs(eBrokenLegs.NO_BROKEN_LEGS);
 		}
 		
-		float dmDistInZone = DM_GetDistanceInZone();
-		if (dmDistInZone > 0)
-		{
-			DecreaseHealth("GlobalHealth", "Health", deltaTime * dmDistInZone * m_dmServerSettings.m_healthOutOfZoneDmg);
-		}
-		else if (m_DmHealthRegenTimeout < 0.1)
-		{
-			AddHealth("GlobalHealth", "Health", deltaTime * m_dmServerSettings.m_healthRegen);
-		}
+		// float dmDistInZone = DM_GetDistanceInZone();
+		// if (dmDistInZone > 0)
+		// {
+		// 	DecreaseHealth("GlobalHealth", "Health", deltaTime * dmDistInZone * m_dmServerSettings.m_healthOutOfZoneDmg);
+		// }
+		// else if (m_DmHealthRegenTimeout < 0.1)
+		// {
+		// 	AddHealth("GlobalHealth", "Health", deltaTime * m_dmServerSettings.m_healthRegen);
+		// }
 		
 		int currentHealth = (int)Math.Round(GetHealth("GlobalHealth", "Health"));
 		if (currentHealth != m_DmHealthValue)
