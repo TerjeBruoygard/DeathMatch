@@ -447,74 +447,74 @@ modded class MissionServer
 		EquipPlayer_DM(player);
 	}
 	
-	void DM_PlayerFastRespawnHandler(PlayerBase deadBody, PlayerIdentity identity)
-	{
-		if (deadBody)
-		{
-			if (identity)
-			{
-				vector pos = CalculateSafePos_DM(DM_GetAreaPos(), Math.Clamp(m_DM_currentRadius - 20, 10, 10000));
-				PlayerBase player = CreateCharacter(identity, pos, null, GetGame().CreateRandomPlayer());
-				if (player)
-				{
-					DM_PlayerCustomRespawnHandler(player, identity, false);
-				}
-			}
+	// void DM_PlayerFastRespawnHandler(PlayerBase deadBody, PlayerIdentity identity)
+	// {
+	// 	if (deadBody)
+	// 	{
+	// 		if (identity)
+	// 		{
+	// 			vector pos = CalculateSafePos_DM(DM_GetAreaPos(), Math.Clamp(m_DM_currentRadius - 20, 10, 10000));
+	// 			PlayerBase player = CreateCharacter(identity, pos, null, GetGame().CreateRandomPlayer());
+	// 			if (player)
+	// 			{
+	// 				DM_PlayerCustomRespawnHandler(player, identity, false);
+	// 			}
+	// 		}
 			
-			GetGame().ObjectDelete(deadBody);
-		}
-	}
+	// 		GetGame().ObjectDelete(deadBody);
+	// 	}
+	// }
 	
-	void DM_PlayerCustomRespawnHandler(PlayerBase player, PlayerIdentity identity, bool calculateSafePos)
-	{
-		string sid = identity.GetId();
-		ref DmPlayerData dmData = null;
-		if (!m_DmDatabase.Find(sid, dmData))
-		{
-			dmData = new DmPlayerData();
-			dmData.Init(identity, m_DM_ServerSettings.m_startMoney);
-			m_DmDatabase.Insert(sid, dmData);
-			DM_Log("Create new player: " + sid);
-		}
-		else
-		{
-			dmData.m_Name = identity.GetName();
-			DM_Log("Load exist player: " + sid);
-		}
+	// void DM_PlayerCustomRespawnHandler(PlayerBase player, PlayerIdentity identity, bool calculateSafePos)
+	// {
+	// 	string sid = identity.GetId();
+	// 	ref DmPlayerData dmData = null;
+	// 	if (!m_DmDatabase.Find(sid, dmData))
+	// 	{
+	// 		dmData = new DmPlayerData();
+	// 		dmData.Init(identity, m_DM_ServerSettings.m_startMoney);
+	// 		m_DmDatabase.Insert(sid, dmData);
+	// 		DM_Log("Create new player: " + sid);
+	// 	}
+	// 	else
+	// 	{
+	// 		dmData.m_Name = identity.GetName();
+	// 		DM_Log("Load exist player: " + sid);
+	// 	}
 		
-		if (dmData.m_CurrentWeapon.Length() == 0 || !dmData.ContainsWeapon(m_DM_ConnectSyncCtx, dmData.m_CurrentWeapon))
-		{
-			dmData.m_CurrentWeapon = m_DM_ConnectSyncCtx.dm_Weapons.Get(0).m_Id;
-		}
+	// 	if (dmData.m_CurrentWeapon.Length() == 0 || !dmData.ContainsWeapon(m_DM_ConnectSyncCtx, dmData.m_CurrentWeapon))
+	// 	{
+	// 		dmData.m_CurrentWeapon = m_DM_ConnectSyncCtx.dm_Weapons.Get(0).m_Id;
+	// 	}
 		
-		if (dmData.m_CurrentEquipment.Length() == 0 || !dmData.ContainsEquipment(m_DM_ConnectSyncCtx, dmData.m_CurrentEquipment))
-		{
-			dmData.m_CurrentEquipment = m_DM_ConnectSyncCtx.dm_Equipments.Get(0).m_Id;
-		}
+	// 	if (dmData.m_CurrentEquipment.Length() == 0 || !dmData.ContainsEquipment(m_DM_ConnectSyncCtx, dmData.m_CurrentEquipment))
+	// 	{
+	// 		dmData.m_CurrentEquipment = m_DM_ConnectSyncCtx.dm_Equipments.Get(0).m_Id;
+	// 	}
 		
-		if (calculateSafePos)
-		{
-			player.SetPosition(CalculateSafePos_DM(DM_GetAreaPos(), Math.Clamp(m_DM_currentRadius - 20, 10, 10000)));
-		}
+	// 	if (calculateSafePos)
+	// 	{
+	// 		player.SetPosition(CalculateSafePos_DM(DM_GetAreaPos(), Math.Clamp(m_DM_currentRadius - 20, 10, 10000)));
+	// 	}
 		
-		player.m_dmServerSettings = m_DM_ServerSettings;
-		player.m_dmPlayerData = dmData;
-		player.m_dmConnectSyncCtx = m_DM_ConnectSyncCtx;
-		player.SynchDmPlayerDataDirty();
-		EquipPlayer_DM(player);
-	}
+	// 	player.m_dmServerSettings = m_DM_ServerSettings;
+	// 	player.m_dmPlayerData = dmData;
+	// 	player.m_dmConnectSyncCtx = m_DM_ConnectSyncCtx;
+	// 	player.SynchDmPlayerDataDirty();
+	// 	EquipPlayer_DM(player);
+	// }
 	
-	override PlayerBase CreateCharacter(PlayerIdentity identity, vector pos, ParamsReadContext ctx, string characterName)
-	{
-		pos = CalculateSafePos_DM(DM_GetAreaPos(), Math.Clamp(m_DM_currentRadius - 20, 10, 10000));
-		return super.CreateCharacter(identity, pos, ctx, characterName);
-	}
+	// override PlayerBase CreateCharacter(PlayerIdentity identity, vector pos, ParamsReadContext ctx, string characterName)
+	// {
+	// 	pos = CalculateSafePos_DM(DM_GetAreaPos(), Math.Clamp(m_DM_currentRadius - 20, 10, 10000));
+	// 	return super.CreateCharacter(identity, pos, ctx, characterName);
+	// }
 	
-	override void InvokeOnConnect(PlayerBase player, PlayerIdentity identity)
-	{
-		super.InvokeOnConnect(player, identity);
-		DM_PlayerCustomRespawnHandler(player, identity, true);
-	}
+	// override void InvokeOnConnect(PlayerBase player, PlayerIdentity identity)
+	// {
+	// 	super.InvokeOnConnect(player, identity);
+	// 	DM_PlayerCustomRespawnHandler(player, identity, true);
+	// }
 	
 	void EquipPlayer_DM(PlayerBase player)
 	{
@@ -593,81 +593,81 @@ modded class MissionServer
 		}
 	}
 	
-	vector CalculateSafePos_DM(vector center, float radius)
-	{
-		int retries = 0;
-		vector contactPos = vector.Zero;
-		vector contactDir = vector.Zero;
-		int contactComp = 0;
-		while (true)
-		{
-			float angle = 2.0 * Math.PI * Math.RandomFloat01();
-			float dist = Math.Sqrt(Math.RandomFloat01()) * radius;
-			float x = center[0] + dist * Math.Cos(angle);
-	    	float z = center[2] + dist * Math.Sin(angle);
-			float y = GetGame().SurfaceY(x, z);
-			if (GetGame().SurfaceIsSea(x, z))
-			{
-				continue;
-			}
+	// vector CalculateSafePos_DM(vector center, float radius)
+	// {
+	// 	int retries = 0;
+	// 	vector contactPos = vector.Zero;
+	// 	vector contactDir = vector.Zero;
+	// 	int contactComp = 0;
+	// 	while (true)
+	// 	{
+	// 		float angle = 2.0 * Math.PI * Math.RandomFloat01();
+	// 		float dist = Math.Sqrt(Math.RandomFloat01()) * radius;
+	// 		float x = center[0] + dist * Math.Cos(angle);
+	//     	float z = center[2] + dist * Math.Sin(angle);
+	// 		float y = GetGame().SurfaceY(x, z);
+	// 		if (GetGame().SurfaceIsSea(x, z))
+	// 		{
+	// 			continue;
+	// 		}
 			
-			if (GetGame().SurfaceIsPond(x, z))
-			{
-				continue;
-			}
+	// 		if (GetGame().SurfaceIsPond(x, z))
+	// 		{
+	// 			continue;
+	// 		}
 			
-			vector raycastFrom = Vector(x, y + 0.2, z);
-			vector raycastTo = Vector(x, y + 100, z);
+	// 		vector raycastFrom = Vector(x, y + 0.2, z);
+	// 		vector raycastTo = Vector(x, y + 100, z);
 			
-			if (DayZPhysics.RaycastRV(raycastFrom, raycastTo, contactPos, contactDir, contactComp))
-			{
-				continue;
-			}
+	// 		if (DayZPhysics.RaycastRV(raycastFrom, raycastTo, contactPos, contactDir, contactComp))
+	// 		{
+	// 			continue;
+	// 		}
 			
-			if (retries < 100)
-			{
-				vector checkPos = Vector(x, y + 1.5, z);
-				if (CheckNearestPlayer(checkPos, 10, 50))
-				{
-					retries = retries + 1;
-					continue;
-				}
-			}
+	// 		if (retries < 100)
+	// 		{
+	// 			vector checkPos = Vector(x, y + 1.5, z);
+	// 			if (CheckNearestPlayer(checkPos, 10, 50))
+	// 			{
+	// 				retries = retries + 1;
+	// 				continue;
+	// 			}
+	// 		}
 			
-			return Vector(x, y, z);
-		}
+	// 		return Vector(x, y, z);
+	// 	}
 		
-		return vector.Zero;
-	};
+	// 	return vector.Zero;
+	// };
 	
-	bool CheckNearestPlayer(vector pos, float minDist, float maxDist)
-	{
-		vector contactPos = vector.Zero;
-		vector contactDir = vector.Zero;
-		int contactComp = 0;
-		array<Man> playersList();
-		GetGame().GetPlayers(playersList);	
-		foreach (Man target: playersList)
-		{
-			vector targetPos = target.GetWorldPosition();
-			float curDist = vector.Distance(pos, targetPos);
-			if (curDist > maxDist)
-			{
-				continue;
-			}
+	// bool CheckNearestPlayer(vector pos, float minDist, float maxDist)
+	// {
+	// 	vector contactPos = vector.Zero;
+	// 	vector contactDir = vector.Zero;
+	// 	int contactComp = 0;
+	// 	array<Man> playersList();
+	// 	GetGame().GetPlayers(playersList);	
+	// 	foreach (Man target: playersList)
+	// 	{
+	// 		vector targetPos = target.GetWorldPosition();
+	// 		float curDist = vector.Distance(pos, targetPos);
+	// 		if (curDist > maxDist)
+	// 		{
+	// 			continue;
+	// 		}
 			
-			if (curDist < minDist)
-			{
-				return true;
-			}
+	// 		if (curDist < minDist)
+	// 		{
+	// 			return true;
+	// 		}
 			
-			targetPos[1] = targetPos[1] + 1.5;
-			if (!DayZPhysics.RaycastRV(pos, targetPos, contactPos, contactDir, contactComp, NULL, NULL, target))
-			{
-				return true;
-			}
-		}
+	// 		targetPos[1] = targetPos[1] + 1.5;
+	// 		if (!DayZPhysics.RaycastRV(pos, targetPos, contactPos, contactDir, contactComp, NULL, NULL, target))
+	// 		{
+	// 			return true;
+	// 		}
+	// 	}
 		
-		return false;
-	};
+	// 	return false;
+	// };
 };
