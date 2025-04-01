@@ -22,8 +22,8 @@ class CfgMods
 		hideName = 0;
 		hidePicture = 1;
 		name = "Death Match";
-		credits = "Terje Bruoygard";
-		version = "1.0.0";
+		credits = "Terje Bruoygard, Duck";
+		version = "2.0.0";
 		author = "Jacob_Mango";
 		extra = 0;
 		type = "mod";

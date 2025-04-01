@@ -17,6 +17,7 @@ class DM_ServerSettings
 	float m_fastRespawnTimeout = 3;
 	int m_clearDroppedItemsOnGround = 1;
 	
+	// will not be called
 	void InitDefaultTrails()
 	{
 		ref DM_AreaTrail trail = new DM_AreaTrail;

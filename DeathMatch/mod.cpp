@@ -4,6 +4,6 @@ logo = "DeathMatch/Textures/mod_icon.edds";
 logoSmall = "DeathMatch/Textures/mod_icon.edds";
 logoOver = "DeathMatch/Textures/mod_icon.edds";
 tooltip = "Death Match";
-overview = "This is dealth match mod by Terje Bruoygard.";
+overview = "This is death match mod by Terje Bruoygard. Updated for x381 by Duck (Ben)";
 author = "Terje Bruoygard";
 version = "1.0.0";
