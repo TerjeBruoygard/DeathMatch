@@ -363,6 +363,7 @@ modded class MissionServer
 	
 	void DM_WeaponBuy(CallType type, ParamsReadContext ctx, PlayerIdentity sender, Object target)
 	{
+
 		if (type != CallType.Server)
 		{
 			return;
@@ -383,19 +384,25 @@ modded class MissionServer
 			return;
 		}
 		
-		if (!player.m_dmPlayerData.ContainsWeapon(player.m_dmConnectSyncCtx, wpnData.m_Id))
-		{
-			if (player.m_dmPlayerData.IsWeaponLocked(wpnData))
-			{
-				return;
-			}
+		// bypass checks and just give weapon to player
+		// if (!player.m_dmPlayerData.ContainsWeapon(player.m_dmConnectSyncCtx, wpnData.m_Id))
+		// {
+		// 	if (player.m_dmPlayerData.IsWeaponLocked(wpnData))
+		// 	{
+		// 		return;
+		// 	}
 			
+		// 	player.m_dmPlayerData.AddWeapon(wpnData.m_Id);
+		// 	player.m_dmPlayerData.m_Money = player.m_dmPlayerData.m_Money - wpnData.m_Price;
+		// 	if (player.m_dmPlayerData.m_Money < 0)
+		// 	{
+		// 		player.m_dmPlayerData.m_Money = 0;
+		// 	}
+		// }
+
+		// dont add duplicate weapons to player data
+		if (!player.m_dmPlayerData.ContainsWeapon(player.m_dmConnectSyncCtx, wpnData.m_Id)) {
 			player.m_dmPlayerData.AddWeapon(wpnData.m_Id);
-			player.m_dmPlayerData.m_Money = player.m_dmPlayerData.m_Money - wpnData.m_Price;
-			if (player.m_dmPlayerData.m_Money < 0)
-			{
-				player.m_dmPlayerData.m_Money = 0;
-			}
 		}
 		
 		DM_Log("DM_WeaponBuy: " + sender.GetName() + ": " + sender.GetId() + " => " + wpnData.m_Name);
@@ -427,20 +434,26 @@ modded class MissionServer
 			return;
 		}
 		
-		
+		// dont check for locked or deduct money
+		// if (!player.m_dmPlayerData.ContainsEquipment(player.m_dmConnectSyncCtx, eqpData.m_Id))
+		// {
+		// 	if (player.m_dmPlayerData.IsEquipmentLocked(eqpData))
+		// 	{
+		// 		return;
+		// 	}
+			
+		// 	player.m_dmPlayerData.AddEquipment(eqpData.m_Id);
+		// 	player.m_dmPlayerData.m_Money = player.m_dmPlayerData.m_Money - eqpData.m_Price;
+		// 	if (player.m_dmPlayerData.m_Money < 0)
+		// 	{
+		// 		player.m_dmPlayerData.m_Money = 0;
+		// 	}
+		// }
+
+		// dont add duplicate equip to player data
 		if (!player.m_dmPlayerData.ContainsEquipment(player.m_dmConnectSyncCtx, eqpData.m_Id))
 		{
-			if (player.m_dmPlayerData.IsEquipmentLocked(eqpData))
-			{
-				return;
-			}
-			
 			player.m_dmPlayerData.AddEquipment(eqpData.m_Id);
-			player.m_dmPlayerData.m_Money = player.m_dmPlayerData.m_Money - eqpData.m_Price;
-			if (player.m_dmPlayerData.m_Money < 0)
-			{
-				player.m_dmPlayerData.m_Money = 0;
-			}
 		}
 		
 		DM_Log("DM_EquipmentBuy: " + sender.GetName() + ": " + sender.GetId() + " => " + eqpData.m_Name);

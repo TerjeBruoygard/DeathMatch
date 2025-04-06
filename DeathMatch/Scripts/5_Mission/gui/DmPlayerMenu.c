@@ -157,8 +157,12 @@ class DmPlayerMenu extends UIScriptedMenu
 		
 		layoutRoot.FindAnyWidget( "PageBodyEquipments" ).Show(true);
 		
-		TextWidget.Cast(layoutRoot.FindAnyWidget("PageBodyEquipmentsLevel")).SetText("Your level: " + player.m_dmPlayerData.m_Level.ToString());
-		TextWidget.Cast(layoutRoot.FindAnyWidget("PageBodyEquipmentsMoneyText")).SetText(player.m_dmPlayerData.m_Money.ToString());
+		// hide for future
+		// TextWidget.Cast(layoutRoot.FindAnyWidget("PageBodyEquipmentsLevel")).SetText("Your level: " + player.m_dmPlayerData.m_Level.ToString());
+		// TextWidget.Cast(layoutRoot.FindAnyWidget("PageBodyEquipmentsMoneyText")).SetText(player.m_dmPlayerData.m_Money.ToString());
+
+		layoutRoot.FindAnyWidget("PageBodyEquipmentsLevel").Show(false);
+		layoutRoot.FindAnyWidget("PageBodyEquipmentsMoneyText").Show(false);
 		
 		ScrollWidget scrollWidget = ScrollWidget.Cast(layoutRoot.FindAnyWidget( "PageBodyEquipmentsScroll" ));
 		m_equipmentPageScroll = scrollWidget.GetVScrollPos01();
@@ -279,6 +283,9 @@ class DmPlayerMenu extends UIScriptedMenu
 		// TextWidget.Cast(layoutRoot.FindAnyWidget("PageBodyWeaponsLevel")).SetText("Your level: " + player.m_dmPlayerData.m_Level.ToString());
 		// TextWidget.Cast(layoutRoot.FindAnyWidget("PageBodyWeaponsMoneyText")).SetText(player.m_dmPlayerData.m_Money.ToString());
 		
+		layoutRoot.FindAnyWidget("PageBodyWeaponsLevel").Show(false);
+		layoutRoot.FindAnyWidget("PageBodyWeaponsMoneyText").Show(false);
+
 		ScrollWidget scrollWidget = ScrollWidget.Cast(layoutRoot.FindAnyWidget( "PageBodyWeaponsScroll" ));
 		m_weaponsPageScroll = scrollWidget.GetVScrollPos01();
 		foreach (Widget del : m_weaponWidgets)
@@ -441,7 +448,7 @@ class DmPlayerMenu extends UIScriptedMenu
 			// 	m_selectedPage = "LeaderBoard";
 			// 	m_dirty = true;
 			// }
-			
+
 			if (m_selectedPage == "Weapons")
 			{
 				if (w.GetUserID() == 1001)
