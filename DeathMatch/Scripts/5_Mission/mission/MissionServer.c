@@ -208,8 +208,8 @@ modded class MissionServer
 	
 	override void OnUpdate(float timeslice)
 	{
-		// array<Man> playersList();
-		// GetGame().GetPlayers(playersList);		
+		array<Man> playersList();
+		GetGame().GetPlayers(playersList);
 		//m_DM_currentRadius = Math.Clamp(playersList.Count() * m_DM_ServerSettings.m_expandStep, m_DmCurrentTrail.m_minRadius, m_DmCurrentTrail.m_maxRadius);
 		
 		//m_DmTrailTimer = m_DmTrailTimer + (timeslice * m_DM_ServerSettings.m_areaMoveSpeed);
@@ -245,21 +245,26 @@ modded class MissionServer
 		// }
 		
 		// vector dmCurPos = DM_GetAreaPos();
-		// foreach (Man manObj : playersList)
-		// {
-		// 	PlayerBase player = PlayerBase.Cast(manObj);
-		// 	if (player)
-		// 	{
-		// 		if (!player.m_DmIsVarsSynch || player.m_DmZoneRadius != m_DM_currentRadius || player.m_DmCenterX != dmCurPos[0] || player.m_DmCenterZ != dmCurPos[2])
-		// 		{
-		// 			player.m_DmCenterX = dmCurPos[0];
-		// 			player.m_DmCenterZ = dmCurPos[2];
-		// 			player.m_DmZoneRadius = m_DM_currentRadius;
-		// 			player.m_DmIsVarsSynch = true;
-		// 			player.SynchDmDirty();
-		// 		}
-		// 	}
-		// }
+		foreach (Man manObj : playersList)
+		{
+			PlayerBase player = PlayerBase.Cast(manObj);
+			// if (player)
+			// {
+			// 	if (!player.m_DmIsVarsSynch || player.m_DmZoneRadius != m_DM_currentRadius || player.m_DmCenterX != dmCurPos[0] || player.m_DmCenterZ != dmCurPos[2])
+			// 	{
+			// 		player.m_DmCenterX = dmCurPos[0];
+			// 		player.m_DmCenterZ = dmCurPos[2];
+			// 		player.m_DmZoneRadius = m_DM_currentRadius;
+			// 		player.m_DmIsVarsSynch = true;
+			// 		player.SynchDmDirty();
+			// 	}
+			// }
+			player.m_dmServerSettings = m_DM_ServerSettings;
+			player.m_dmPlayerData = dmData;
+			player.m_dmConnectSyncCtx = m_DM_ConnectSyncCtx;
+			player.SynchDmPlayerDataDirty();
+			EquipPlayer_DM(player);
+		}
 		
 		super.OnUpdate(timeslice);
 	};
