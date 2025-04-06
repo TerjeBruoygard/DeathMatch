@@ -2,7 +2,7 @@ modded class MissionServer
 {
 	ref DmConnectSyncContext m_DM_ConnectSyncCtx;
 	ref DM_ServerSettings m_DM_ServerSettings;
-	// ref map<string, ref DmPlayerData> m_DmDatabase;
+	ref map<string, ref DmPlayerData> m_DmDatabase;
 	// ref array<ref DmPlayerData> m_DmLeaderboard;
 	// ref DM_AreaTrail m_DmCurrentTrail;
 	// ref DmLeaderBoardData m_DmLeaderBoardCtx;
@@ -21,7 +21,7 @@ modded class MissionServer
 		// m_DmLeaderBoardCtx.Init();
 		
 		// m_DmLeaderboard = new array<ref DmPlayerData>;
-		// m_DmDatabase = new map<string, ref DmPlayerData>;
+		m_DmDatabase = new map<string, ref DmPlayerData>;
 		m_DM_ServerSettings = new DM_ServerSettings;
 		m_DM_ConnectSyncCtx = new DmConnectSyncContext;
 		m_DM_ConnectSyncCtx.dm_Weapons = new array<ref DmWeaponPresset>;
@@ -244,6 +244,9 @@ modded class MissionServer
 		// 	SaveDatabase_DM();
 		// }
 		
+		// ben note: this should be temp, i think this will cause issues
+		ref DmPlayerData dmData = new DmPlayerData();
+
 		// vector dmCurPos = DM_GetAreaPos();
 		foreach (Man manObj : playersList)
 		{
