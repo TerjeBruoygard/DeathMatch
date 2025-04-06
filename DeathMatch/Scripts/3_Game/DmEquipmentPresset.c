@@ -23,7 +23,7 @@ class DmEquipmentPresset
 	
 	static void CreateDefaultPressets(array<ref DmEquipmentPresset> result)
 	{
-		result.Insert((new DmEquipmentPresset()).Init("prison", "Prisoner", 0, 0).Atth("PrisonerCap").Atth("PrisonUniformJacket").Atth("PrisonUniformPants").Atth("AthleticShoes_Black"));
+		result.Insert((new DmEquipmentPresset()).Init("prison", "Prisoner", 1, 0).Atth("PrisonerCap").Atth("PrisonUniformJacket").Atth("PrisonUniformPants").Atth("AthleticShoes_Black"));
 		result.Insert((new DmEquipmentPresset()).Init("farmer", "Farmer", 2, 50).Atth("LeatherHat_Brown").Atth("LeatherJacket_Brown").Atth("CanvasPants_Beige").Atth("Wellies_Black"));
 		result.Insert((new DmEquipmentPresset()).Init("worker", "Worker", 3, 100).Atth("FlatCap_BrownCheck").Atth("BomberJacket_SkyBlue").Atth("Jeans_Brown").Atth("WorkingGloves_Yellow").Atth("WorkingBoots_Grey"));
 		result.Insert((new DmEquipmentPresset()).Init("tramp", "Tramp", 4, 150).Atth("FlatCap_Blue").Atth("TrackSuitJacket_Black").Atth("TrackSuitPants_Black").Atth("Sneakers_Black"));
@@ -40,7 +40,7 @@ class DmEquipmentPresset
 		result.Insert((new DmEquipmentPresset()).Init("ghill_b", "Ghillie Woodland", 40, 5000).Atth("GhillieHood_Woodland").Atth("GhillieSuit_Woodland").Atth("GorkaPants_PautRev").Atth("GorkaEJacket_PautRev").Atth("Sneakers_Black"));
 		result.Insert((new DmEquipmentPresset()).Init("ghill_c", "Ghillie Tan", 40, 5000).Atth("GhillieHood_Tan").Atth("GhillieSuit_Tan").Atth("GorkaPants_Summer").Atth("GorkaEJacket_Summer").Atth("Sneakers_Black"));
 		
-		result.Insert((new DmEquipmentPresset()).Init("santa", "Santa", 0, 0).Atth("SantasBeard").Atth("SantasHat").Atth("QuiltedJacket_Red").Atth("JumpsuitPants_Red").Atth("CombatBoots_Black"));
+		result.Insert((new DmEquipmentPresset()).Init("santa", "Santa", 50, 8000).Atth("SantasBeard").Atth("SantasHat").Atth("QuiltedJacket_Red").Atth("JumpsuitPants_Red").Atth("CombatBoots_Black"));
 		result.Insert((new DmEquipmentPresset()).Init("witch", "Witch", 50, 8000).Atth("WitchHat").Atth("WorkingGloves_Black").Atth("MiniDress_RedChecker").Atth("ShortJeans_Black").Atth("DressShoes_Black"));
 		result.Insert((new DmEquipmentPresset()).Init("jack", "Jack", 50, 8000).Atth("PumpkinHelmet").Atth("FirefighterJacket_Beige").Atth("FirefightersPants_Beige").Atth("LeatherGloves_Beige").Atth("CombatBoots_Black"));
 	}
