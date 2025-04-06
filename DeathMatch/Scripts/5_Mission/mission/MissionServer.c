@@ -208,8 +208,8 @@ modded class MissionServer
 	
 	override void OnUpdate(float timeslice)
 	{
-		array<Man> playersList();
-		GetGame().GetPlayers(playersList);
+		// array<Man> playersList();
+		// GetGame().GetPlayers(playersList);
 		//m_DM_currentRadius = Math.Clamp(playersList.Count() * m_DM_ServerSettings.m_expandStep, m_DmCurrentTrail.m_minRadius, m_DmCurrentTrail.m_maxRadius);
 		
 		//m_DmTrailTimer = m_DmTrailTimer + (timeslice * m_DM_ServerSettings.m_areaMoveSpeed);
@@ -245,29 +245,24 @@ modded class MissionServer
 		// }
 		
 		// ben note: this should be temp, i think this will cause issues
-		ref DmPlayerData dmData = new DmPlayerData();
+		// ref DmPlayerData dmData = new DmPlayerData();
 
 		// vector dmCurPos = DM_GetAreaPos();
-		foreach (Man manObj : playersList)
-		{
-			PlayerBase player = PlayerBase.Cast(manObj);
-			// if (player)
-			// {
-			// 	if (!player.m_DmIsVarsSynch || player.m_DmZoneRadius != m_DM_currentRadius || player.m_DmCenterX != dmCurPos[0] || player.m_DmCenterZ != dmCurPos[2])
-			// 	{
-			// 		player.m_DmCenterX = dmCurPos[0];
-			// 		player.m_DmCenterZ = dmCurPos[2];
-			// 		player.m_DmZoneRadius = m_DM_currentRadius;
-			// 		player.m_DmIsVarsSynch = true;
-			// 		player.SynchDmDirty();
-			// 	}
-			// }
-			player.m_dmServerSettings = m_DM_ServerSettings;
-			player.m_dmPlayerData = dmData;
-			player.m_dmConnectSyncCtx = m_DM_ConnectSyncCtx;
-			player.SynchDmPlayerDataDirty();
-			EquipPlayer_DM(player);
-		}
+		// foreach (Man manObj : playersList)
+		// {
+		// 	PlayerBase player = PlayerBase.Cast(manObj);
+		// 	// if (player)
+		// 	// {
+		// 	// 	if (!player.m_DmIsVarsSynch || player.m_DmZoneRadius != m_DM_currentRadius || player.m_DmCenterX != dmCurPos[0] || player.m_DmCenterZ != dmCurPos[2])
+		// 	// 	{
+		// 	// 		player.m_DmCenterX = dmCurPos[0];
+		// 	// 		player.m_DmCenterZ = dmCurPos[2];
+		// 	// 		player.m_DmZoneRadius = m_DM_currentRadius;
+		// 	// 		player.m_DmIsVarsSynch = true;
+		// 	// 		player.SynchDmDirty();
+		// 	// 	}
+		// 	// }
+		// }
 		
 		super.OnUpdate(timeslice);
 	};
@@ -473,44 +468,39 @@ modded class MissionServer
 	// 	}
 	// }
 	
-	// void DM_PlayerCustomRespawnHandler(PlayerBase player, PlayerIdentity identity, bool calculateSafePos)
-	// {
-	// 	string sid = identity.GetId();
-	// 	ref DmPlayerData dmData = null;
-	// 	if (!m_DmDatabase.Find(sid, dmData))
-	// 	{
-	// 		dmData = new DmPlayerData();
-	// 		dmData.Init(identity, m_DM_ServerSettings.m_startMoney);
-	// 		m_DmDatabase.Insert(sid, dmData);
-	// 		DM_Log("Create new player: " + sid);
-	// 	}
-	// 	else
-	// 	{
-	// 		dmData.m_Name = identity.GetName();
-	// 		DM_Log("Load exist player: " + sid);
-	// 	}
+	void DM_PlayerCustomRespawnHandler(PlayerBase player, PlayerIdentity identity)
+	{
+		string sid = identity.GetId();
+		ref DmPlayerData dmData = null;
+		if (!m_DmDatabase.Find(sid, dmData))
+		{
+			dmData = new DmPlayerData();
+			dmData.Init(identity, m_DM_ServerSettings.m_startMoney);
+			m_DmDatabase.Insert(sid, dmData);
+			DM_Log("Create new player: " + sid);
+		}
+		else
+		{
+			dmData.m_Name = identity.GetName();
+			DM_Log("Load exist player: " + sid);
+		}
 		
-	// 	if (dmData.m_CurrentWeapon.Length() == 0 || !dmData.ContainsWeapon(m_DM_ConnectSyncCtx, dmData.m_CurrentWeapon))
-	// 	{
-	// 		dmData.m_CurrentWeapon = m_DM_ConnectSyncCtx.dm_Weapons.Get(0).m_Id;
-	// 	}
+		if (dmData.m_CurrentWeapon.Length() == 0 || !dmData.ContainsWeapon(m_DM_ConnectSyncCtx, dmData.m_CurrentWeapon))
+		{
+			dmData.m_CurrentWeapon = m_DM_ConnectSyncCtx.dm_Weapons.Get(0).m_Id;
+		}
 		
-	// 	if (dmData.m_CurrentEquipment.Length() == 0 || !dmData.ContainsEquipment(m_DM_ConnectSyncCtx, dmData.m_CurrentEquipment))
-	// 	{
-	// 		dmData.m_CurrentEquipment = m_DM_ConnectSyncCtx.dm_Equipments.Get(0).m_Id;
-	// 	}
+		if (dmData.m_CurrentEquipment.Length() == 0 || !dmData.ContainsEquipment(m_DM_ConnectSyncCtx, dmData.m_CurrentEquipment))
+		{
+			dmData.m_CurrentEquipment = m_DM_ConnectSyncCtx.dm_Equipments.Get(0).m_Id;
+		}
 		
-	// 	if (calculateSafePos)
-	// 	{
-	// 		player.SetPosition(CalculateSafePos_DM(DM_GetAreaPos(), Math.Clamp(m_DM_currentRadius - 20, 10, 10000)));
-	// 	}
-		
-	// 	player.m_dmServerSettings = m_DM_ServerSettings;
-	// 	player.m_dmPlayerData = dmData;
-	// 	player.m_dmConnectSyncCtx = m_DM_ConnectSyncCtx;
-	// 	player.SynchDmPlayerDataDirty();
-	// 	EquipPlayer_DM(player);
-	// }
+		player.m_dmServerSettings = m_DM_ServerSettings;
+		player.m_dmPlayerData = dmData;
+		player.m_dmConnectSyncCtx = m_DM_ConnectSyncCtx;
+		player.SynchDmPlayerDataDirty();
+		EquipPlayer_DM(player);
+	}
 	
 	// override PlayerBase CreateCharacter(PlayerIdentity identity, vector pos, ParamsReadContext ctx, string characterName)
 	// {
@@ -518,11 +508,11 @@ modded class MissionServer
 	// 	return super.CreateCharacter(identity, pos, ctx, characterName);
 	// }
 	
-	// override void InvokeOnConnect(PlayerBase player, PlayerIdentity identity)
-	// {
-	// 	super.InvokeOnConnect(player, identity);
-	// 	DM_PlayerCustomRespawnHandler(player, identity, true);
-	// }
+	override void InvokeOnConnect(PlayerBase player, PlayerIdentity identity)
+	{
+		super.InvokeOnConnect(player, identity);
+		DM_PlayerCustomRespawnHandler(player, identity);
+	}
 	
 	void EquipPlayer_DM(PlayerBase player)
 	{
