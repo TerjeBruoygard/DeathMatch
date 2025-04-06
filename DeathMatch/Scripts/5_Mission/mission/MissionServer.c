@@ -78,30 +78,30 @@ modded class MissionServer
 			CopyFile(path + ".backup", path);
 		}
 		
-		// if (FileExist(path))
-		// {
-		// 	DM_Log("Start database loading...");
-		// 	FileSerializer ctx = new FileSerializer();
-		// 	ctx.Open(path, FileMode.READ);
-		// 	if (ctx.IsOpen())
-		// 	{
-		// 		int ver;
-		// 		int count;
-		// 		ctx.Read(ver);
-		// 		ctx.Read(count);			
-		// 		for (int i = 0; i < count; i++)
-		// 		{
-		// 			string sid;
-		// 			ref DmPlayerData dmData = new DmPlayerData();
-		// 			ctx.Read(sid);
-		// 			dmData.Deserialize(ctx, ver);
-		// 			m_DmDatabase.Set(sid, dmData);
-		// 		}
+		if (FileExist(path))
+		{
+			DM_Log("Start database loading...");
+			FileSerializer ctx = new FileSerializer();
+			ctx.Open(path, FileMode.READ);
+			if (ctx.IsOpen())
+			{
+				int ver;
+				int count;
+				ctx.Read(ver);
+				ctx.Read(count);			
+				for (int i = 0; i < count; i++)
+				{
+					string sid;
+					ref DmPlayerData dmData = new DmPlayerData();
+					ctx.Read(sid);
+					dmData.Deserialize(ctx, ver);
+					m_DmDatabase.Set(sid, dmData);
+				}
 				
-		// 		ctx.Close();
-		// 		DM_Log("Finish database loading...OK " + count.ToString());
-		// 	}
-		// }
+				ctx.Close();
+				DM_Log("Finish database loading...OK " + count.ToString());
+			}
+		}
 		
 		// BuildLeaderboard_DM();
 		GetGame().GetWorld().GetDate(m_DmYear, m_DmMonth, m_DmDay, m_DmHour, m_DmMinute);
