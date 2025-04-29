@@ -449,19 +449,20 @@ modded class MissionServer
 	
 	void DM_PlayerFastRespawnHandler(PlayerBase deadBody, PlayerIdentity identity)
 	{
+		if (identity)
+		{
+			vector pos = CalculateSafePos_DM(DM_GetAreaPos(), Math.Clamp(m_DM_currentRadius - 20, 10, 10000));
+			PlayerBase player = CreateCharacter(identity, pos, null, GetGame().CreateRandomPlayer());
+			if (player)
+			{
+				DM_PlayerCustomRespawnHandler(player, identity, false);
+			}
+		}
+		
 		if (deadBody)
 		{
-			if (identity)
-			{
-				vector pos = CalculateSafePos_DM(DM_GetAreaPos(), Math.Clamp(m_DM_currentRadius - 20, 10, 10000));
-				PlayerBase player = CreateCharacter(identity, pos, null, GetGame().CreateRandomPlayer());
-				if (player)
-				{
-					DM_PlayerCustomRespawnHandler(player, identity, false);
-				}
-			}
-			
-			GetGame().ObjectDelete(deadBody);
+			ref Param1<PlayerBase> deletePlayerParams = new Param1<PlayerBase>(deadBody);
+			GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLaterByName(GetGame(), "ObjectDelete", 5000, false, deletePlayerParams);
 		}
 	}
 	

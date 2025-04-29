@@ -187,7 +187,7 @@ modded class PlayerBase
 		else
 		{
 			ref Param1<PlayerBase> deletePlayerParams = new Param1<PlayerBase>(this);
-			GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLaterByName(GetGame(), "ObjectDelete", 1000, false, deletePlayerParams);
+			GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLaterByName(GetGame(), "ObjectDelete", 5000, false, deletePlayerParams);
 		}
 	}
 	
