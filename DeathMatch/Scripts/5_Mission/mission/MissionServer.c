@@ -45,6 +45,11 @@ modded class MissionServer
 		m_DM_currentRadius = m_DmCurrentTrail.m_minRadius;
 		m_DmTrailShift = Math.RandomFloat01() * (m_DmCurrentTrail.m_points.Count() - 1);
 		
+		if (m_DM_ServerSettings.m_fastRespawnTimeout < 0)
+		{
+			m_DM_ConnectSyncCtx.m_allowManualRespawn = true;
+		}
+		
 		// Weapons
 		path = "$profile:DM\\Weapons.json";
 		if (FileExist(path))
@@ -557,7 +562,7 @@ modded class MissionServer
 		}
 	}
 	
-	void EquipPlayerClothing_DM(PlayerBase player, ref DmEquipmentPresset ep)
+	void EquipPlayerClothing_DM(PlayerBase player, DmEquipmentPresset ep)
 	{
 		foreach (string itClass : ep.m_Items)
 		{
@@ -569,7 +574,7 @@ modded class MissionServer
 		}
 	}
 	
-	void EquipPlayerWeapon_DM(PlayerBase player, ref DmWeaponPresset wp)
+	void EquipPlayerWeapon_DM(PlayerBase player, DmWeaponPresset wp)
 	{
 		Weapon_Base weapon = Weapon_Base.Cast(player.GetHumanInventory().CreateInHands(wp.m_Classname));
 		if (weapon)

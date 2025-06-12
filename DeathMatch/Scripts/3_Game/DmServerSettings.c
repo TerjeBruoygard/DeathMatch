@@ -14,7 +14,7 @@ class DM_ServerSettings
 	int m_databaseWipePlayerTimeout = 1209600; // 14 days
 	int m_leaderBoardTopSize = 20;
 	int m_lockWorldTime = 1;
-	float m_fastRespawnTimeout = -1;
+	float m_fastRespawnTimeout = 3;
 	int m_clearDroppedItemsOnGround = 1;
 	
 	void InitDefaultTrails()

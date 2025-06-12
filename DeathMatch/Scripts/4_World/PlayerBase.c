@@ -329,7 +329,7 @@ modded class PlayerBase
 		m_DmSynchTimer = m_DmSynchTimer + deltaTime;
 		m_DmPlayerDataSynchTimer = m_DmPlayerDataSynchTimer + deltaTime;
 		
-		if (!m_DmPlayerReady)
+		if (!m_DmPlayerReady && m_dmConnectSyncCtx)
 		{
 			m_DmPlayerReady = true;
 			ref Param1<ref DmConnectSyncContext> rpcConnCtx = new Param1<ref DmConnectSyncContext>(m_dmConnectSyncCtx);

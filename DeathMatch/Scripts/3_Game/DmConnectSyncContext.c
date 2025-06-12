@@ -1,5 +1,6 @@
 class DmConnectSyncContext
 {
+	bool m_allowManualRespawn = false;
 	ref array<ref DmWeaponPresset> dm_Weapons;
 	ref array<ref DmEquipmentPresset> dm_Equipments;
 	
