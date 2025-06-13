@@ -333,7 +333,7 @@ modded class PlayerBase
 		{
 			m_DmPlayerReady = true;
 			ref Param1<ref DmConnectSyncContext> rpcConnCtx = new Param1<ref DmConnectSyncContext>(m_dmConnectSyncCtx);
-			RPCSingleParam(14880033, rpcConnCtx, true, GetIdentity());
+			GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater(RPCSendDelayedConnectSync, 1200, false, rpcConnCtx, GetIdentity());
 		}
 		
 		if (m_DmSynchDirty && m_DmSynchTimer > 1.0)
@@ -376,4 +376,10 @@ modded class PlayerBase
 			}
 		}
 	}
+
+	void RPCSendDelayedConnectSync(Param1<ref DmConnectSyncContext> ctx, PlayerIdentity identity)
+	{
+		RPCSingleParam(14880033, ctx, true, identity);
+	}
+
 };

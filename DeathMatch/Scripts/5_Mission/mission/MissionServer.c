@@ -409,7 +409,7 @@ modded class MissionServer
 		
 		player.m_dmPlayerData.m_CurrentWeapon = wpnData.m_Id;
 		player.SynchDmPlayerDataDirty();
-		EquipPlayer_DM(player);
+		GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater(EquipPlayer_DM, 1000, false, player);
 	}
 	
 	void DM_EquipmentBuy(CallType type, ParamsReadContext ctx, PlayerIdentity sender, Object target)
@@ -460,7 +460,7 @@ modded class MissionServer
 		
 		player.m_dmPlayerData.m_CurrentEquipment = eqpData.m_Id;
 		player.SynchDmPlayerDataDirty();
-		EquipPlayer_DM(player);
+		GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater(EquipPlayer_DM, 1000, false, player);
 	}
 	
 	// void DM_PlayerFastRespawnHandler(PlayerBase deadBody, PlayerIdentity identity)
@@ -512,7 +512,7 @@ modded class MissionServer
 		player.m_dmPlayerData = dmData;
 		player.m_dmConnectSyncCtx = m_DM_ConnectSyncCtx;
 		player.SynchDmPlayerDataDirty();
-		EquipPlayer_DM(player);
+		GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater(EquipPlayer_DM, 1000, false, player);
 	}
 	
 	// override PlayerBase CreateCharacter(PlayerIdentity identity, vector pos, ParamsReadContext ctx, string characterName)
