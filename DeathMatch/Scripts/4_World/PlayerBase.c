@@ -333,7 +333,11 @@ modded class PlayerBase
 		{
 			m_DmPlayerReady = true;
 			ref Param1<ref DmConnectSyncContext> rpcConnCtx = new Param1<ref DmConnectSyncContext>(m_dmConnectSyncCtx);
-			GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater(RPCSendDelayedConnectSync, 1200, false, rpcConnCtx, GetIdentity());
+			
+			// dont do async call to try and fix desync issue
+			//GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater(RPCSendDelayedConnectSync, 1200, false, rpcConnCtx, GetIdentity());
+			
+			RPCSingleParam(14880033, ctx, true, identity);
 		}
 		
 		if (m_DmSynchDirty && m_DmSynchTimer > 1.0)

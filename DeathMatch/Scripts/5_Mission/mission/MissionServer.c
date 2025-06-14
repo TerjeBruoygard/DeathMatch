@@ -409,7 +409,11 @@ modded class MissionServer
 		
 		player.m_dmPlayerData.m_CurrentWeapon = wpnData.m_Id;
 		player.SynchDmPlayerDataDirty();
-		GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater(EquipPlayer_DM, 1000, false, player);
+
+		// dont do async call to try and fix desync issue
+		//GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater(EquipPlayer_DM, 1000, false, player);
+
+		EquipPlayer_DM(player);
 	}
 	
 	void DM_EquipmentBuy(CallType type, ParamsReadContext ctx, PlayerIdentity sender, Object target)
