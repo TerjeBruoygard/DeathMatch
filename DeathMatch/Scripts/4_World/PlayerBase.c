@@ -337,7 +337,7 @@ modded class PlayerBase
 			// dont do async call to try and fix desync issue
 			//GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater(RPCSendDelayedConnectSync, 1200, false, rpcConnCtx, GetIdentity());
 			
-			RPCSingleParam(14880033, ctx, true, identity);
+			RPCSingleParam(14880033, rpcConnCtx, true, GetIdentity());
 		}
 		
 		if (m_DmSynchDirty && m_DmSynchTimer > 1.0)
