@@ -10,7 +10,7 @@
 	<!-- presets -->
 	<preset>
         <input name="UAToggleDeathMatchMenu">
-            <btn name="kO" />
+            <btn name="kJ" />
         </input>
 	</preset>
 </modded_inputs>
