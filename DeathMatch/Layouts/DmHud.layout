@@ -287,7 +287,6 @@ FrameWidgetClass rootFrame {
     }
     TextWidgetClass TextWidget0 {
      ignorepointer 1
-     color 0.502 0 0 1
      position 0 0
      size 1 1
      hexactpos 1
@@ -336,8 +335,7 @@ FrameWidgetClass rootFrame {
      image0 "set:dayz_gui image:key_icon"
      mode blend
      "src alpha" 1
-     "no wrap" 1
-     stretch 0
+     "clamp mode" clamp
      "flip u" 0
      "flip v" 0
      filter 1

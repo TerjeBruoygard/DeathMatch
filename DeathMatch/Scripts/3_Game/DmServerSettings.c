@@ -16,6 +16,7 @@ class DM_ServerSettings
 	int m_lockWorldTime = 1;
 	float m_fastRespawnTimeout = 3;
 	int m_clearDroppedItemsOnGround = 1;
+	int m_visibleGasBorders = 1;
 	
 	void InitDefaultTrails()
 	{

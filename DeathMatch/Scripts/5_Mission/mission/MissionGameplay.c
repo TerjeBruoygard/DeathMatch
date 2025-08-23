@@ -112,7 +112,7 @@ modded class MissionGameplay
 			if (player.m_DmIsVarsSynch && (player.m_DmZoneRadiusLast != player.m_DmZoneRadius || player.m_DmCenterX != player.m_DmCenterXLast || player.m_DmCenterZ != player.m_DmCenterZLast))
 			{
 				DM_DestroyBorderParticles();
-				DM_SpawnBorderParticles(Vector(player.m_DmCenterX, 0, player.m_DmCenterZ), player.m_DmZoneRadius);
+				DM_SpawnBorderParticles(player, Vector(player.m_DmCenterX, 0, player.m_DmCenterZ), player.m_DmZoneRadius);
 				player.m_DmZoneRadiusLast = player.m_DmZoneRadius;
 				player.m_DmCenterXLast = player.m_DmCenterX;
 				player.m_DmCenterZLast = player.m_DmCenterZ;
@@ -287,8 +287,18 @@ modded class MissionGameplay
 		m_DmKillfeedClean = 10;
 	}
 	
-	void DM_SpawnBorderParticles(vector center, float radius)
+	void DM_SpawnBorderParticles(PlayerBase player, vector center, float radius)
 	{
+		if (!player)
+		{
+			return;
+		}
+		
+		if (player.m_DmVisibleGasBorders != 1)
+		{
+			return;
+		}
+		
 		int particleId = ParticleList.CONTAMINATED_AREA_GAS_BIGASS;
 		vector pos = "0 0 0";
 		radius = radius + 20;

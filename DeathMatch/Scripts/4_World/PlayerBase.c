@@ -5,6 +5,7 @@ modded class PlayerBase
 	float m_DmZoneRadiusLast = -1;
 	float m_DmCenterXLast = 0;
 	float m_DmCenterZLast = 0;
+	int m_DmVisibleGasBorders = 0;
 	
 	// Synch vars
 	bool m_DmIsVarsSynch = false;
@@ -33,24 +34,25 @@ modded class PlayerBase
 		
 		if (rpc_type == 14880011)
 		{
-			ref Param4<float, float, float, int> dmContext = new Param4<float, float, float, int>(0, 0, 0, 0);
+			Param5<float, float, float, int, int> dmContext(0, 0, 0, 0, 0);
 			ctx.Read( dmContext );
 			m_DmIsVarsSynch = true;
 			m_DmCenterX = dmContext.param1;
 			m_DmCenterZ = dmContext.param2;
 			m_DmZoneRadius = dmContext.param3;
 			m_DmHealthValue = dmContext.param4;
+			m_DmVisibleGasBorders = dmContext.param5;
 		}
 		else if (rpc_type == 14880022)
 		{
-			ref Param1<ref DmPlayerData> dmPlayerDataContext = new Param1<ref DmPlayerData>(null);
+			Param1<ref DmPlayerData> dmPlayerDataContext(null);
 			ctx.Read( dmPlayerDataContext );
 			m_dmPlayerData = dmPlayerDataContext.param1;
 			m_DmDataUpdated = true;
 		}
 		else if (rpc_type == 14880033)
 		{
-			ref Param1<ref DmConnectSyncContext> dmConnSyncCtx = new Param1<ref DmConnectSyncContext>(null);
+			Param1<ref DmConnectSyncContext> dmConnSyncCtx(null);
 			ctx.Read( dmConnSyncCtx );
 			m_dmConnectSyncCtx = dmConnSyncCtx.param1;
 		}
@@ -70,7 +72,7 @@ modded class PlayerBase
 	{
 		super.OnScheduledTick(deltaTime);
 		
-		if (GetGame().IsServer() && IsAlive())
+		if (GetGame() && GetGame().IsDedicatedServer() && IsAlive())
 		{
 			DM_RefillStats(deltaTime);
 			DM_RefillMags(deltaTime);
@@ -101,7 +103,7 @@ modded class PlayerBase
 	
 	void DM_OnDead(PlayerBase killer)
 	{
-		if (GetGame().IsServer() && m_dmPlayerData && killer.m_dmPlayerData && m_dmServerSettings)
+		if (GetGame() && GetGame().IsDedicatedServer() && killer && m_dmPlayerData && killer.m_dmPlayerData && m_dmServerSettings)
 		{
 			m_dmPlayerData.m_Death = m_dmPlayerData.m_Death + 1;
 			
@@ -125,7 +127,7 @@ modded class PlayerBase
 	
 	void DM_OnKill(PlayerBase murder)
 	{
-		if (GetGame().IsServer() && m_dmPlayerData && murder.m_dmPlayerData && m_dmServerSettings)
+		if (GetGame() && GetGame().IsDedicatedServer() && m_dmPlayerData && murder.m_dmPlayerData && m_dmServerSettings)
 		{
 			m_dmPlayerData.m_Kills = m_dmPlayerData.m_Kills + 1;
 			m_dmPlayerData.m_Money = m_dmPlayerData.m_Money + m_dmServerSettings.m_moneyPerKill;
@@ -178,16 +180,19 @@ modded class PlayerBase
 		
 		super.EEKilled( killer );
 		
-		int fastRespawnTimeoutTime = (int)(m_dmServerSettings.m_fastRespawnTimeout * 1000);
-		if (fastRespawnTimeoutTime > 0)
+		if (GetGame())
 		{
-			ref Param2<PlayerBase, PlayerIdentity> fastRespawnParams = new Param2<PlayerBase, PlayerIdentity>(this, GetIdentity());
-			GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLaterByName(GetGame().GetMission(), "DM_PlayerFastRespawnHandler", fastRespawnTimeoutTime, false, fastRespawnParams);
-		}
-		else
-		{
-			ref Param1<PlayerBase> deletePlayerParams = new Param1<PlayerBase>(this);
-			GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLaterByName(GetGame(), "ObjectDelete", 5000, false, deletePlayerParams);
+			int fastRespawnTimeoutTime = (int)(m_dmServerSettings.m_fastRespawnTimeout * 1000);
+			if (fastRespawnTimeoutTime > 0)
+			{
+				Param2<PlayerBase, PlayerIdentity> fastRespawnParams(this, GetIdentity());
+				GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLaterByName(GetGame().GetMission(), "DM_PlayerFastRespawnHandler", fastRespawnTimeoutTime, false, fastRespawnParams);
+			}
+			else
+			{
+				Param1<PlayerBase> deletePlayerParams(this);
+				GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLaterByName(GetGame(), "ObjectDelete", 5000, false, deletePlayerParams);
+			}
 		}
 	}
 	
@@ -300,7 +305,7 @@ modded class PlayerBase
 				{
 					int curAmmo = mag.GetAmmoCount();
 					int maxAmmo = mag.GetAmmoMax();
-					if (mag.GetAmmoCount() < mag.GetAmmoMax())
+					if (GetGame() && (mag.GetAmmoCount() < mag.GetAmmoMax()))
 					{
 						string magType = mag.GetType();
 						GetGame().ObjectDelete(mag);
@@ -332,15 +337,15 @@ modded class PlayerBase
 		if (!m_DmPlayerReady && m_dmConnectSyncCtx)
 		{
 			m_DmPlayerReady = true;
-			ref Param1<ref DmConnectSyncContext> rpcConnCtx = new Param1<ref DmConnectSyncContext>(m_dmConnectSyncCtx);
+			Param1<ref DmConnectSyncContext> rpcConnCtx(m_dmConnectSyncCtx);
 			RPCSingleParam(14880033, rpcConnCtx, true, GetIdentity());
 		}
 		
-		if (m_DmSynchDirty && m_DmSynchTimer > 1.0)
+		if (m_DmSynchDirty && (m_DmSynchTimer > 1.0) && (m_dmServerSettings != null))
 		{
 			m_DmSynchTimer = 0;
 			m_DmSynchDirty = false;
-			ref Param4<float, float, float, int> dmContext = new Param4<float, float, float, int>(m_DmCenterX, m_DmCenterZ, m_DmZoneRadius, m_DmHealthValue);
+			Param5<float, float, float, int, int> dmContext(m_DmCenterX, m_DmCenterZ, m_DmZoneRadius, m_DmHealthValue, m_dmServerSettings.m_visibleGasBorders);
 			RPCSingleParam(14880011, dmContext, true, GetIdentity());
 		}
 		
@@ -348,7 +353,7 @@ modded class PlayerBase
 		{
 			m_DmPlayerDataSynchTimer = 0;
 			m_DmPlayerDataSynchDirty = false;
-			ref Param1<ref DmPlayerData> dmPlayerDataContext = new Param1<ref DmPlayerData>(m_dmPlayerData);
+			Param1<ref DmPlayerData> dmPlayerDataContext(m_dmPlayerData);
 			RPCSingleParam(14880022, dmPlayerDataContext, true, GetIdentity());
 		}
 	}
@@ -361,7 +366,7 @@ modded class PlayerBase
 		}
 		
 		m_DmClearItemsTimer = m_DmClearItemsTimer + deltaTime;
-		if (m_DmClearItemsTimer > 1.0)
+		if (GetGame() && (m_DmClearItemsTimer > 1.0))
 		{
 			m_DmClearItemsTimer = 0;
 			ItemBase nearestItem = NULL;
