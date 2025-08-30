@@ -174,10 +174,9 @@ modded class MissionGameplay
 		float x, y, w, h;
 		EntityAI wpnObject;
 		Widget item = m_DmKillFeedItems.Get(0);
-		item.GetSize(w, h);
-		
 		if (item)
 		{
+			item.GetSize(w, h);
 			item.GetUserData(wpnObject);
 			if (wpnObject)
 			{
@@ -190,8 +189,11 @@ modded class MissionGameplay
 		m_DmKillFeedItems.Remove(0);
 		foreach (Widget widget : m_DmKillFeedItems)
 		{
-			widget.GetPos(x, y);
-			widget.SetPos(x, y - (h + 4));
+			if (widget)
+			{
+				widget.GetPos(x, y);
+				widget.SetPos(x, y - (h + 4));
+			}
 		}
 	}
 	
@@ -235,6 +237,11 @@ modded class MissionGameplay
 		}
 		
 		if (!player.m_dmConnectSyncCtx)
+		{
+			return;
+		}
+		
+		if (player.m_DmEnableKillFeed != 1)
 		{
 			return;
 		}

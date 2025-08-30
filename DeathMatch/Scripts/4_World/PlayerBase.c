@@ -6,6 +6,8 @@ modded class PlayerBase
 	float m_DmCenterXLast = 0;
 	float m_DmCenterZLast = 0;
 	int m_DmVisibleGasBorders = 0;
+	int m_DmEnableLeaderboard = 0;
+	int m_DmEnableKillFeed = 0;
 	
 	// Synch vars
 	bool m_DmIsVarsSynch = false;
@@ -34,7 +36,7 @@ modded class PlayerBase
 		
 		if (rpc_type == 14880011)
 		{
-			Param5<float, float, float, int, int> dmContext(0, 0, 0, 0, 0);
+			Param7<float, float, float, int, int, int, int> dmContext(0, 0, 0, 0, 0, 0, 0);
 			ctx.Read( dmContext );
 			m_DmIsVarsSynch = true;
 			m_DmCenterX = dmContext.param1;
@@ -42,6 +44,8 @@ modded class PlayerBase
 			m_DmZoneRadius = dmContext.param3;
 			m_DmHealthValue = dmContext.param4;
 			m_DmVisibleGasBorders = dmContext.param5;
+			m_DmEnableLeaderboard = dmContext.param6;
+			m_DmEnableKillFeed = dmContext.param7;
 		}
 		else if (rpc_type == 14880022)
 		{
@@ -140,10 +144,14 @@ modded class PlayerBase
 				m_dmPlayerData.m_Level = m_dmPlayerData.m_Level + 1;
 			}
 			
-			int distance = (int)Math.Round(vector.Distance(GetWorldPosition(), murder.GetWorldPosition()));
-			string srcName = GetIdentity().GetName() + " (" + distance.ToString() + "m)";
-			string dstName = murder.GetIdentity().GetName();
-			GetRPCManager().SendRPC("DM", "DM_KillFeed", new Param3<string, string, string>(srcName, dstName, m_dmPlayerData.m_CurrentWeapon), true, null); 
+			if (m_dmServerSettings.m_enableKillFeed == 1)
+			{
+				int distance = (int)Math.Round(vector.Distance(GetWorldPosition(), murder.GetWorldPosition()));
+				string srcName = GetIdentity().GetName() + " (" + distance.ToString() + "m)";
+				string dstName = murder.GetIdentity().GetName();
+				GetRPCManager().SendRPC("DM", "DM_KillFeed", new Param3<string, string, string>(srcName, dstName, m_dmPlayerData.m_CurrentWeapon), true, null); 
+			}
+			
 			SetHealth01("GlobalHealth", "Health", 1.0);
 			SynchDmPlayerDataDirty();
 			SetSynchDirty();
@@ -345,7 +353,7 @@ modded class PlayerBase
 		{
 			m_DmSynchTimer = 0;
 			m_DmSynchDirty = false;
-			Param5<float, float, float, int, int> dmContext(m_DmCenterX, m_DmCenterZ, m_DmZoneRadius, m_DmHealthValue, m_dmServerSettings.m_visibleGasBorders);
+			Param7<float, float, float, int, int, int, int> dmContext(m_DmCenterX, m_DmCenterZ, m_DmZoneRadius, m_DmHealthValue, m_dmServerSettings.m_visibleGasBorders, m_dmServerSettings.m_enableLeaderboard, m_dmServerSettings.m_enableKillFeed);
 			RPCSingleParam(14880011, dmContext, true, GetIdentity());
 		}
 		

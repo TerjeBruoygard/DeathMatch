@@ -4,6 +4,7 @@ modded class MissionServer
 	ref DM_ServerSettings m_DM_ServerSettings;
 	ref map<string, ref DmPlayerData> m_DmDatabase;
 	ref array<ref DmPlayerData> m_DmLeaderboard;
+	ref set<string> m_DmAdminsList;
 	ref DM_AreaTrail m_DmCurrentTrail;
 	ref DmLeaderBoardData m_DmLeaderBoardCtx;
 	float m_DmTrailShift = 0;
@@ -20,6 +21,7 @@ modded class MissionServer
 		m_DmLeaderBoardCtx = new DmLeaderBoardData;
 		m_DmLeaderBoardCtx.Init();
 		
+		m_DmAdminsList = new set<string>;
 		m_DmLeaderboard = new array<ref DmPlayerData>;
 		m_DmDatabase = new map<string, ref DmPlayerData>;
 		m_DM_ServerSettings = new DM_ServerSettings;
@@ -76,6 +78,37 @@ modded class MissionServer
 		
 		JsonFileLoader<ref array<ref DmEquipmentPresset>>.JsonSaveFile(path,  m_DM_ConnectSyncCtx.dm_Equipments);
 		
+		// Admins list
+		path = "$profile:DM\\Admins.txt";
+		if (FileExist(path))
+		{
+			FileHandle adminsFileRead = OpenFile(path, FileMode.READ);
+			if (adminsFileRead != 0)
+			{
+				string adminGuidLine;
+				while ( FGets( adminsFileRead, adminGuidLine ) != -1 )
+				{
+					adminGuidLine = adminGuidLine.Trim();
+					if (adminGuidLine.Length() > 0 && adminGuidLine.IndexOf("#") != 0)
+					{
+						m_DmAdminsList.Insert(adminGuidLine);
+					}
+				}
+				
+				CloseFile(adminsFileRead);
+			}
+		}
+		else
+		{
+			FileHandle adminsFileWrite = OpenFile(path, FileMode.WRITE);
+			if (adminsFileWrite != 0)
+			{
+				FPrintln(adminsFileWrite, "# Add SteamIDs of admins to this file (one per line) to allow /dm chat commands.");
+				FPrintln(adminsFileWrite, "");
+				CloseFile(adminsFileWrite);
+			}
+		}
+		
 		// Players DB
 		path = "$profile:DM\\Players.dat";
 		if (!FileExist(path) && FileExist(path + ".backup"))
@@ -113,10 +146,16 @@ modded class MissionServer
 		GetRPCManager().AddRPC("DM", "DM_WeaponBuy", this, SingleplayerExecutionType.Server);
 		GetRPCManager().AddRPC("DM", "DM_EquipmentBuy", this, SingleplayerExecutionType.Server);
 		GetRPCManager().AddRPC("DM", "DM_LeaderBoardSrv", this, SingleplayerExecutionType.Server);
+		GetRPCManager().AddRPC("DM", "DM_AdminCommand", this, SingleplayerExecutionType.Server);
 	};
 	
 	void BuildLeaderboard_DM()
 	{
+		if (m_DM_ServerSettings.m_enableLeaderboard != 1)
+		{
+			return;
+		}
+		
 		array<float> kdSortedArray();
 		multiMap<float, string> kdMultiMap(); 
 		foreach (string sid, ref DmPlayerData dmData : m_DmDatabase)
@@ -322,6 +361,11 @@ modded class MissionServer
 			return;
 		}
 		
+		if (m_DM_ServerSettings.m_enableKillFeed != 1)
+		{
+			return;
+		}
+		
 		PlayerBase player = PlayerBase.Cast(target);
 		if (!player || !player.IsAlive() || !player.m_dmPlayerData)
 		{
@@ -361,6 +405,214 @@ modded class MissionServer
 		}
 		
 		GetRPCManager().SendRPC("DM", "DM_LeaderBoard", new Param1<ref DmLeaderBoardData>(m_DmLeaderBoardCtx), true, sender); 
+	}
+	
+	void DM_AdminCommand(CallType type, ParamsReadContext ctx, PlayerIdentity sender, Object target)
+	{
+		if (type != CallType.Server)
+		{
+			return;
+		}
+		
+		if (!sender)
+		{
+			return;
+		}
+		
+		if ((m_DmAdminsList.Find(sender.GetId()) == -1) && (m_DmAdminsList.Find(sender.GetPlainId()) == -1))
+		{
+			return;
+		}
+		
+		PlayerBase adminPlayer = PlayerBase.Cast(target);
+		if (!adminPlayer)
+		{
+			return;
+		}
+		
+		Param1<string> data;
+		if (!ctx.Read(data)) return;
+		
+		TStringArray parts();
+		data.param1.Trim().Split(" ", parts);
+		
+		if (parts.Count() > 0)
+		{
+			string msg;
+			if (DM_ProcessAdminCommand(adminPlayer, parts, msg))
+			{
+				GetGame().ChatMP(adminPlayer, "COMMAND SUCCESS: " + msg, "colorImportant");
+			}
+			else
+			{
+				GetGame().ChatMP(adminPlayer, "COMMAND FAILED: " + msg, "colorImportant");
+			}
+		}
+		else
+		{
+			GetGame().ChatMP(adminPlayer, "COMMAND FAILED:  Invalid parameters", "colorImportant");
+		}
+	}
+	
+	bool DM_ProcessAdminCommand(PlayerBase admin, TStringArray parts, out string msg)
+	{
+		PlayerBase targetPlayer = null;
+		DmPlayerData targetData = null;;
+		string cmd = parts.Get(0);
+		if (cmd == "money")
+		{
+			if (parts.Count() != 3)
+			{
+				msg = "Invalid command format: money [guid/steamid/name] [value]";
+				return false;
+			}
+			
+			string mplguid = parts.Get(1);
+			string mplvalue = parts.Get(2);
+			
+			if (DM_FindPlayerForAdminCommand(mplguid, targetPlayer, targetData))
+			{
+				string moneyGuid = mplguid;
+				int money = Math.Clamp(mplvalue.ToInt(), 0, 999999999);
+				if (targetData)
+				{
+					moneyGuid = targetData.m_Name;
+					targetData.m_Money = money;
+				}
+				
+				if (targetPlayer && targetPlayer.m_dmPlayerData)
+				{
+					if (targetPlayer.GetIdentity())
+					{
+						moneyGuid = targetPlayer.GetIdentity().GetName() + " (" + targetPlayer.GetIdentity().GetId() + ")";
+					}
+					
+					targetPlayer.m_dmPlayerData.m_Money = money;
+					targetPlayer.m_DmPlayerDataSynchDirty = true;
+					GetGame().ChatMP(targetPlayer, "Your money is set to " + money + " by server admin.", "colorImportant");
+				}
+				
+				msg = "Money set to " + money + " for player " + moneyGuid;
+				return true;
+			}
+			else
+			{
+				msg = "Failed to find player with guid or name '" + mplguid + "'";
+				return false;
+			}
+		}
+		else if (cmd == "level")
+		{
+			if (parts.Count() != 3)
+			{
+				msg = "Invalid command format: level [guid/steamid/name] [value]";
+				return false;
+			}
+			
+			string lplguid = parts.Get(1);
+			string lplvalue = parts.Get(2);
+			
+			if (DM_FindPlayerForAdminCommand(lplguid, targetPlayer, targetData))
+			{
+				string levelGuid = lplguid;
+				int level = Math.Clamp(lplvalue.ToInt(), 0, 999999);
+				if (targetData)
+				{
+					levelGuid = targetData.m_Name;
+					targetData.m_Level = level;
+				}
+				
+				if (targetPlayer && targetPlayer.m_dmPlayerData)
+				{
+					if (targetPlayer.GetIdentity())
+					{
+						levelGuid = targetPlayer.GetIdentity().GetName() + " (" + targetPlayer.GetIdentity().GetId() + ")";
+					}
+					
+					targetPlayer.m_dmPlayerData.m_Level = level;
+					targetPlayer.m_DmPlayerDataSynchDirty = true;
+					GetGame().ChatMP(targetPlayer, "Your level is set to " + level + " by server admin.", "colorImportant");
+				}
+				
+				msg = "Level set to " + level + " for player " + levelGuid;
+				return true;
+			}
+			else
+			{
+				msg = "Failed to find player with guid or name '" + lplguid + "'";
+				return false;
+			}
+		}
+		
+		msg = "Invalid parameters";
+		return false;
+	}
+	
+	bool DM_FindPlayerForAdminCommand(string guid, out PlayerBase player, out DmPlayerData data)
+	{
+		PlayerBase plObj;
+		array<Man> playersList();
+		GetGame().GetPlayers(playersList);
+		foreach (Man man0 : playersList)
+		{
+			plObj = PlayerBase.Cast(man0);
+			if (plObj && plObj.GetIdentity() && plObj.m_dmPlayerData)
+			{
+				if (plObj.GetIdentity().GetId() == guid)
+				{
+					player = plObj;
+					data = plObj.m_dmPlayerData;
+					return true;
+				}
+				
+				if (plObj.GetIdentity().GetPlainId() == guid)
+				{
+					player = plObj;
+					data = plObj.m_dmPlayerData;
+					return true;
+				}
+			}
+		}
+		
+		foreach (Man man1 : playersList)
+		{
+			plObj = PlayerBase.Cast(man1);
+			if (plObj && plObj.GetIdentity() && plObj.m_dmPlayerData)
+			{
+				
+				if (plObj.GetIdentity().GetName() == guid)
+				{
+					player = plObj;
+					data = plObj.m_dmPlayerData;
+					return true;
+				}
+			}
+		}
+		
+		foreach (Man man2 : playersList)
+		{
+			plObj = PlayerBase.Cast(man2);
+			if (plObj && plObj.GetIdentity() && plObj.m_dmPlayerData)
+			{
+				if ((guid.LengthUtf8() > 3) && (plObj.GetIdentity().GetName().IndexOf(guid) == 0))
+				{
+					player = plObj;
+					data = plObj.m_dmPlayerData;
+					return true;
+				}
+			}
+		}
+		
+		
+		if (m_DmDatabase.Find(guid, data))
+		{
+			player = null;
+			return true;
+		}
+		
+		player = null;
+		data = null;
+		return false;
 	}
 	
 	void DM_WeaponBuy(CallType type, ParamsReadContext ctx, PlayerIdentity sender, Object target)

@@ -17,6 +17,8 @@ class DM_ServerSettings
 	float m_fastRespawnTimeout = 3;
 	int m_clearDroppedItemsOnGround = 1;
 	int m_visibleGasBorders = 1;
+	int m_enableLeaderboard = 1;
+	int m_enableKillFeed = 1;
 	
 	void InitDefaultTrails()
 	{

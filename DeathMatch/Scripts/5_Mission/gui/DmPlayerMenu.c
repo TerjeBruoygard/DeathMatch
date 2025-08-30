@@ -51,14 +51,21 @@ class DmPlayerMenu extends UIScriptedMenu
 		}
 		else if (m_selectedPage == "LeaderBoard")
 		{
-			if (m_leaderBoardData == null)
+			if (player.m_DmEnableLeaderboard == 1)
 			{
-				HideAllPages();
-				GetRPCManager().SendRPC("DM", "DM_LeaderBoardSrv", new Param1<int>(0), true, null, player); 
+				if (m_leaderBoardData == null)
+				{
+					HideAllPages();
+					GetRPCManager().SendRPC("DM", "DM_LeaderBoardSrv", new Param1<int>(0), true, null, player); 
+				}
+				else
+				{
+					DisplayLeaderBoardPage();
+				}
 			}
 			else
 			{
-				DisplayLeaderBoardPage();
+				HideAllPages();
 			}
 		}
 	}
@@ -378,6 +385,7 @@ class DmPlayerMenu extends UIScriptedMenu
 		
 		if (button == MouseState.LEFT)
 		{
+			PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
 			if (w.GetParent().GetName() == "PageTabWeapons")
 			{
 				m_selectedPage = "Weapons";
@@ -390,8 +398,11 @@ class DmPlayerMenu extends UIScriptedMenu
 			}
 			else if (w.GetParent().GetName() == "PageTabLeaderBoard")
 			{
-				m_selectedPage = "LeaderBoard";
-				m_dirty = true;
+				if (player && player.m_DmEnableLeaderboard == 1)
+				{
+					m_selectedPage = "LeaderBoard";
+					m_dirty = true;
+				}
 			}
 			
 			if (m_selectedPage == "Weapons")
@@ -431,11 +442,22 @@ class DmPlayerMenu extends UIScriptedMenu
 
 		SetFocus( layoutRoot );
 		
+		bool showLeaderboard = false;
 		PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
 		if (player)
 		{
 			player.GetInputController().SetDisabled(true);
 			player.GetActionManager().EnableActions(false);
+			
+			if (player && player.m_DmEnableLeaderboard == 1)
+			{
+				showLeaderboard = true;
+			}
+		}
+		
+		if (layoutRoot != null)
+		{
+			layoutRoot.FindAnyWidget("PageTabLeaderBoard").Show(showLeaderboard);
 		}
 	}
 
